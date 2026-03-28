@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mantenimiento Royalty — Sucursales</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#00C48C;--accent-dim:#00a376;--accent-glow:rgba(0,196,140,0.15);
+  --surface:#0f1117;--surface2:#161b24;--surface3:#1e2535;--surface4:#252d3e;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text1:#f0f2f7;--text2:#8b93a7;--text3:#525c73;
+  --red:#ff4d6a;--amber:#ffb347;--blue:#4d9fff;--green:#00C48C;
+  --radius:10px;--radius-lg:14px;--radius-xl:20px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text1);min-height:100vh}
+.app{max-width:1060px;margin:0 auto;padding:1.25rem}
+.hidden{display:none!important}
+input,select,textarea{font-family:'DM Sans',sans-serif;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);padding:9px 13px;width:100%;background:var(--surface3);color:var(--text1);transition:border-color .15s,box-shadow .15s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+select option,select optgroup{background:var(--surface3)}
+select optgroup{color:var(--text3);font-size:11px;font-style:normal;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface3);color:var(--text2);padding:8px 16px;font-size:13px;font-weight:500;transition:all .15s}
+button:hover{background:var(--surface4);color:var(--text1)}
+button.primary{background:var(--accent);color:#0a1a12;border-color:var(--accent);font-weight:600}
+button.primary:hover{background:var(--accent-dim)}
+button.approve{background:rgba(0,196,140,.1);color:var(--green);border-color:rgba(0,196,140,.25);font-size:12px;padding:5px 12px}
+button.approve:hover{background:rgba(0,196,140,.2)}
+button.reject{background:rgba(255,77,106,.08);color:var(--red);border-color:rgba(255,77,106,.2);font-size:12px;padding:5px 12px}
+button.reject:hover{background:rgba(255,77,106,.18)}
+.card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;letter-spacing:.03em}
+.b-green{background:rgba(0,196,140,.12);color:#00C48C}
+.b-amber{background:rgba(255,179,71,.12);color:#ffb347}
+.b-red{background:rgba(255,77,106,.12);color:#ff4d6a}
+.b-blue{background:rgba(77,159,255,.12);color:#4d9fff}
+.b-gray{background:rgba(139,147,167,.12);color:#8b93a7}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 12px;color:var(--text3);font-weight:500;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text1);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:200}
+.modal{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-xl);padding:1.75rem;width:560px;max-width:96vw;max-height:93vh;overflow-y:auto}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:1.25rem}
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:11px;font-weight:500;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.c-green::before{background:var(--accent)}
+.stat-card.c-amber::before{background:var(--amber)}
+.stat-card.c-red::before{background:var(--red)}
+.stat-card.c-blue::before{background:var(--blue)}
+.stat-num{font-family:'DM Mono',monospace;font-size:26px;font-weight:500;line-height:1}
+.stat-label{font-size:11px;color:var(--text2);margin-top:5px;text-transform:uppercase;letter-spacing:.05em}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding:.9rem 1.25rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-logo{width:42px;height:42px;background:#000;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-title{font-size:15px;font-weight:600;line-height:1.2}
+.brand-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.layout{display:grid;grid-template-columns:210px 1fr;gap:1rem;align-items:start}
+.sidebar{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.75rem;position:sticky;top:1rem}
+.sidebar-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;padding:6px 10px;font-weight:500;margin-top:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius);border:none;background:none;cursor:pointer;width:100%;text-align:left;color:var(--text2);font-size:13px;font-weight:400;transition:all .12s;margin-bottom:2px}
+.nav-item:hover{background:var(--surface3);color:var(--text1)}
+.nav-item.active{background:var(--accent-glow);color:var(--accent);font-weight:500}
+.nav-item svg{flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.notif-dot{width:7px;height:7px;background:var(--red);border-radius:50%;margin-left:auto;flex-shrink:0}
+.tab-bar{display:flex;gap:4px;background:var(--surface3);padding:4px;border-radius:var(--radius);width:fit-content;margin-bottom:1rem;flex-wrap:wrap}
+.tab{padding:6px 14px;font-size:12px;font-weight:500;border:none;background:none;cursor:pointer;color:var(--text2);border-radius:7px;transition:all .12s}
+.tab.active{background:var(--surface4);color:var(--text1)}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
+.sec-head h2{font-size:15px;font-weight:600}
+.empty{text-align:center;padding:3rem 1rem;color:var(--text3)}
+.empty p{font-size:13px;margin-top:.75rem}
+.login-wrap{min-height:90vh;display:flex;align-items:center;justify-content:center}
+.login-box{width:400px;max-width:96vw}
+.login-logo{width:100px;display:block;margin:0 auto 1.5rem}
+.login-title{font-size:22px;font-weight:600;text-align:center;margin-bottom:3px;letter-spacing:.02em}
+.login-sub{font-size:13px;color:var(--text2);text-align:center;margin-bottom:2rem;line-height:1.6}
+.login-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:1rem;line-height:1.7}
+.admin-bar{display:flex;align-items:center;gap:10px;padding:.75rem 1rem;background:rgba(0,196,140,.06);border:1px solid rgba(0,196,140,.15);border-radius:var(--radius);margin-bottom:1rem;font-size:13px}
+select.sm{width:auto;padding:7px 11px;font-size:12px}
+.zone-pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em}
+.zp-sur{background:rgba(255,179,71,.12);color:#ffb347}
+.zp-centro{background:rgba(77,159,255,.12);color:#4d9fff}
+.zp-norte{background:rgba(255,77,106,.12);color:#ff4d6a}
+.zp-custom{background:rgba(168,127,255,.12);color:#a87fff}
+.notif-banner{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1rem 1.25rem;width:320px;z-index:300;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.notif-banner.wa{border-left:3px solid #25D366}
+.notif-banner.email{border-left:3px solid var(--blue)}
+.notif-banner.success{border-left:3px solid var(--accent)}
+.approval-card{background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1rem;margin-bottom:10px}
+.approval-card.pending{border-left:3px solid var(--amber)}
+.approval-card.approved{border-left:3px solid var(--green);opacity:.65}
+.approval-card.rejected{border-left:3px solid var(--red);opacity:.5}
+.pass-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.pass-row:last-child{border-bottom:none}
+.img-upload-zone{border:1.5px dashed var(--border2);border-radius:var(--radius-lg);padding:1.5rem;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;position:relative}
+.img-upload-zone:hover,.img-upload-zone:focus-within{border-color:var(--accent);background:var(--accent-glow)}
+.img-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.img-thumb{position:relative;border-radius:var(--radius);overflow:hidden;aspect-ratio:4/3;background:var(--surface3)}
+.img-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.img-thumb-del{position:absolute;top:4px;right:4px;width:20px;height:20px;background:rgba(255,77,106,.85);border:none;border-radius:50%;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1}
+.cotiz-box{background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1rem;margin-top:4px}
+.cotiz-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0}
+.cotiz-row.total{border-top:1px solid var(--border2);margin-top:6px;padding-top:10px}
+.cotiz-row.total span:last-child{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--accent)}
+.cotiz-row span:first-child{font-size:12px;color:var(--text2)}
+.cotiz-row span:last-child{font-family:'DM Mono',monospace;font-size:13px;font-weight:500}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:400;display:flex;align-items:center;justify-content:center}
+.lightbox img{max-width:90vw;max-height:88vh;border-radius:var(--radius-lg);object-fit:contain}
+.lightbox-close{position:fixed;top:1rem;right:1.25rem;background:none;border:none;color:#fff;font-size:30px;cursor:pointer;z-index:401}
+.iva-badge{background:rgba(0,196,140,.1);color:var(--accent);border:1px solid rgba(0,196,140,.2);border-radius:6px;font-size:11px;font-weight:600;padding:2px 7px;font-family:'DM Mono',monospace}
+.report-filter-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:1.25rem;padding:1rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg)}
+.report-filter-bar .form-row{margin-bottom:0;min-width:130px}
+.chart-wrap{background:var(--surface3);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1rem}
+.chart-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.85rem}
+.email-preview{background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius);padding:1rem;font-size:12px;color:var(--text2);max-height:180px;overflow-y:auto;white-space:pre-wrap;font-family:'DM Mono',monospace;line-height:1.6}
+.encargado-card{background:var(--surface3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.enc-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;color:#0a1a12}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .25s ease forwards}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.slide-in{animation:slideIn .3s ease forwards}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-wrap fade-up">
+  <div class="login-box">
+    <svg class="login-logo" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="120" height="80" rx="10" fill="#000"/>
+      <path d="M20 12 L20 68 M20 12 L52 12 Q72 12 72 32 Q72 48 58 50 L72 68 M20 42 L50 42" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M26 18 L26 62 M26 18 L52 18 Q66 18 66 32 Q66 44 54 46" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".45"/>
+      <text x="80" y="36" fill="#fff" font-size="9" font-family="Georgia,serif" letter-spacing="1">ROYALTY</text>
+      <text x="78" y="52" fill="#fff" font-size="11" font-family="Georgia,serif" letter-spacing="2">CASINO</text>
+    </svg>
+    <div class="login-title">Mantenimiento Royalty</div>
+    <div class="login-sub">Mantenimiento y Aires Acondicionados<br>Sistema de Control</div>
+    <div class="card" style="border-color:var(--border2)">
+      <div class="form-row"><label>Zona / Sucursal</label><select id="loginSucursal"></select></div>
+      <div class="form-row" style="margin-bottom:18px"><label>Contraseña</label><input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <div id="loginError" style="color:var(--red);font-size:12px;margin-bottom:10px;display:none;background:rgba(255,77,106,.08);padding:8px 12px;border-radius:var(--radius)">Contraseña incorrecta.</div>
+      <button class="primary" style="width:100%;padding:11px;font-size:14px" onclick="doLogin()">Iniciar sesión</button>
+    </div>
+    <div class="login-hint">Responsable general: <strong style="color:var(--text2)">Cuenta General</strong></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="hidden fade-up">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg width="28" height="28" viewBox="0 0 60 60" fill="none">
+          <rect width="60" height="60" fill="#000"/>
+          <path d="M10 8 L10 52 M10 8 L34 8 Q50 8 50 24 Q50 36 38 38 L50 52 M10 30 L34 30" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title" id="brandTitle">Mantenimiento Royalty</div>
+        <div class="brand-sub" id="headerSub">Sistema de Control</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span id="zoneBadge" class="zone-pill hidden"></span>
+      <span id="roleBadge" class="badge"></span>
+      <button onclick="doLogout()" style="padding:7px 14px;font-size:12px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:5px"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Salir
+      </button>
+    </div>
+  </div>
+
+  <div id="adminBar" class="admin-bar hidden">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14"/><path d="M4.93 4.93a10 10 0 000 14.14"/></svg>
+    <label>Filtrar sucursal:</label>
+    <select class="sm" id="adminView" onchange="switchAdminView()"></select>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-label">Principal</div>
+      <button class="nav-item active" id="nav-dashboard" onclick="showMod('dashboard',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+      </button>
+      <button class="nav-item" id="nav-aprobaciones" onclick="showMod('aprobaciones',this)" style="display:none">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Aprobaciones<span id="aprobDot" class="notif-dot hidden"></span>
+      </button>
+      <button class="nav-item" id="nav-reportes" onclick="showMod('reportes',this)" style="display:none">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reportes
+      </button>
+      <div class="sidebar-label">Registros</div>
+      <button class="nav-item" id="nav-inventario" onclick="showMod('inventario',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8l-2 4h12l-2-4z"/></svg>Inventario
+      </button>
+      <button class="nav-item" id="nav-mantenimientos" onclick="showMod('mantenimientos',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Programación
+      </button>
+      <button class="nav-item" id="nav-incidencias" onclick="showMod('incidencias',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Incidencias
+      </button>
+      <button class="nav-item" id="nav-materiales" onclick="showMod('materiales',this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Materiales
+      </button>
+      <div class="sidebar-label" id="adminSection" style="display:none">Administración</div>
+      <button class="nav-item" id="nav-encargados" onclick="showMod('encargados',this)" style="display:none">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Encargados
+      </button>
+      <button class="nav-item" id="nav-notificaciones" onclick="showMod('notificaciones',this)" style="display:none">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>Notificaciones
+      </button>
+      <button class="nav-item" id="nav-contrasenas" onclick="showMod('contrasenas',this)" style="display:none">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Contraseñas
+      </button>
+    </div>
+
+    <div id="content">
+      <!-- DASHBOARD -->
+      <div id="mod-dashboard" class="fade-up">
+        <div class="grid4" style="margin-bottom:1rem" id="dashStats"></div>
+        <div id="pendingAlert" class="hidden" style="background:rgba(255,179,71,.07);border:1px solid rgba(255,179,71,.25);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg><span id="pendingAlertText" style="font-size:13px;color:var(--amber)"></span></div>
+          <button onclick="showMod('aprobaciones',document.getElementById('nav-aprobaciones'))" style="font-size:12px;padding:5px 12px;color:var(--amber);border-color:rgba(255,179,71,.3)">Ver →</button>
+        </div>
+        <div class="grid2" style="gap:1rem">
+          <div class="card"><div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Próximos mantenimientos</div><div id="dashProximos"></div></div>
+          <div class="card"><div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Incidencias recientes</div><div id="dashIncidencias"></div></div>
+        </div>
+        <div id="encargadoCard" class="hidden" style="margin-top:1rem"></div>
+      </div>
+
+      <!-- APROBACIONES -->
+      <div id="mod-aprobaciones" class="hidden fade-up">
+        <div class="tab-bar"><button class="tab active" onclick="aprobTab='materiales';renderAprobaciones();setTab(this)">Solicitudes</button><button class="tab" onclick="aprobTab='incidencias';renderAprobaciones();setTab(this)">Incidencias</button><button class="tab" onclick="aprobTab='mantenimientos';renderAprobaciones();setTab(this)">Mantenimientos</button></div>
+        <div id="aprobContent"></div>
+      </div>
+
+      <!-- REPORTES -->
+      <div id="mod-reportes" class="hidden fade-up">
+        <div class="sec-head">
+          <h2>Reportes y Estadísticas</h2>
+          <div style="display:flex;gap:8px">
+            <button onclick="exportPDF()" style="font-size:12px;padding:7px 14px">Exportar PDF</button>
+            <button onclick="openEmailModal()" class="primary" style="font-size:12px;padding:7px 14px">Enviar por correo</button>
+          </div>
+        </div>
+        <div class="report-filter-bar">
+          <div class="form-row"><label>Sucursal</label><select class="sm" id="rptSucursal" onchange="renderReportes()" style="min-width:160px"></select></div>
+          <div class="form-row"><label>Período</label><select class="sm" id="rptPeriodo" onchange="renderReportes()"><option value="semana">Esta semana</option><option value="mes">Este mes</option><option value="trimestre">Este trimestre</option><option value="todo" selected>Todo el período</option></select></div>
+          <div class="form-row"><label>Tipo</label><select class="sm" id="rptTipo" onchange="renderReportes()"><option value="gastos">Gastos y compras</option><option value="incidencias">Incidencias</option><option value="mantenimientos">Mantenimientos</option><option value="semanal">Resumen semanal</option></select></div>
+        </div>
+        <div id="rptContent"></div>
+      </div>
+
+      <!-- INVENTARIO -->
+      <div id="mod-inventario" class="hidden">
+        <div class="tab-bar"><button class="tab active" onclick="invTab='equipos';renderInv();setTab(this)">Equipos</button><button class="tab" onclick="invTab='herramientas';renderInv();setTab(this)">Herramientas</button></div>
+        <div class="sec-head"><h2 id="invTitle">Equipos</h2><button class="primary" onclick="openModal('invModal')">+ Agregar</button></div>
+        <div class="card" style="padding:0;overflow:hidden"><div id="invTable"></div></div>
+      </div>
+      <!-- MANTENIMIENTOS -->
+      <div id="mod-mantenimientos" class="hidden">
+        <div class="sec-head"><h2>Programación</h2><button class="primary" onclick="openModal('mantModal')">+ Programar</button></div>
+        <div class="card" style="padding:0;overflow:hidden"><div id="mantTable"></div></div>
+      </div>
+      <!-- INCIDENCIAS -->
+      <div id="mod-incidencias" class="hidden">
+        <div class="sec-head"><h2>Incidencias</h2><button class="primary" onclick="openModal('incModal')">+ Nueva</button></div>
+        <div class="card" style="padding:0;overflow:hidden"><div id="incTable"></div></div>
+      </div>
+      <!-- MATERIALES -->
+      <div id="mod-materiales" class="hidden">
+        <div class="sec-head"><h2>Solicitud de materiales</h2><button class="primary" onclick="openModal('matModal')">+ Solicitar</button></div>
+        <div class="card" style="padding:0;overflow:hidden"><div id="matTable"></div></div>
+      </div>
+
+      <!-- ENCARGADOS (admin) -->
+      <div id="mod-encargados" class="hidden fade-up">
+        <div class="sec-head"><h2>Encargados de mantenimiento</h2></div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:1.25rem;line-height:1.6">Asigna y administra al encargado del área de mantenimiento de cada sucursal. Esta información es visible en el dashboard de cada sucursal y en los reportes.</div>
+        <div id="encargadosList"></div>
+      </div>
+
+      <!-- NOTIFICACIONES (admin) -->
+      <div id="mod-notificaciones" class="hidden fade-up">
+        <div class="sec-head"><h2>Notificaciones</h2></div>
+        <div class="card" style="margin-bottom:1rem"><div style="font-size:13px;font-weight:500;margin-bottom:1rem;color:var(--text2)">Correo del administrador</div><div class="form-row"><label>Correo</label><input id="cfgEmail" placeholder="admin@royaltycasino.com"/></div><button class="primary" onclick="saveNotifConfig()">Guardar</button></div>
+        <div class="card" style="margin-bottom:1rem"><div style="font-size:13px;font-weight:500;margin-bottom:.5rem;color:var(--text2)">WhatsApp Business API</div><div style="font-size:11px;color:var(--text3);margin-bottom:1rem">Meta / WhatsApp Business Cloud API</div><div class="form-row"><label>Teléfono admin (con código de país)</label><input id="cfgPhone" placeholder="+52 55 1234 5678"/></div><div class="form-row"><label>Phone Number ID</label><input id="cfgPhoneId" placeholder="1234567890"/></div><div class="form-row"><label>Access Token</label><input id="cfgToken" type="password" placeholder="EAAxxxxxxx..."/></div><div style="display:flex;gap:8px"><button class="primary" onclick="saveWaConfig()">Guardar WA</button><button onclick="testWA()">Prueba</button></div></div>
+        <div class="card"><div style="font-size:13px;font-weight:500;margin-bottom:1rem;color:var(--text2)">Eventos activos</div><div id="notifEventsList"></div></div>
+      </div>
+      <!-- CONTRASEÑAS (admin) -->
+      <div id="mod-contrasenas" class="hidden fade-up">
+        <div class="sec-head"><h2>Contraseñas</h2></div>
+        <div class="card" style="margin-bottom:1rem"><div style="font-size:13px;font-weight:500;margin-bottom:.25rem;color:var(--text2)">Contraseña del administrador</div><div class="grid2" style="margin-top:1rem"><div class="form-row"><label>Nueva contraseña</label><input type="password" id="adminPass1"/></div><div class="form-row"><label>Confirmar</label><input type="password" id="adminPass2"/></div></div><button class="primary" onclick="changeAdminPass()">Actualizar</button><div id="adminPassMsg" style="font-size:12px;margin-top:8px"></div></div>
+        <div class="card"><div style="font-size:13px;font-weight:500;margin-bottom:1rem;color:var(--text2)">Contraseñas por sucursal</div><div id="passTable"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="invModal" class="modal-bg hidden"><div class="modal"><h3>Agregar al inventario</h3><div class="form-row"><label>Tipo</label><select id="invTipo"><option value="equipo">Equipo / Máquina</option><option value="herramienta">Herramienta</option></select></div><div class="form-row"><label>Nombre</label><input id="invNombre" placeholder="Ej: Aire acondicionado Split 24000 BTU"/></div><div class="form-row"><label>Marca / Modelo</label><input id="invModelo"/></div><div class="form-row"><label>Número de serie</label><input id="invSerie"/></div><div class="grid2"><div class="form-row"><label>Categoría</label><select id="invCategoria"><option>Aire acondicionado</option><option>Casino — máquina tragamonedas</option><option>Casino — mesa de juego</option><option>Eléctrico</option><option>Plomería</option><option>Herramienta manual</option><option>Herramienta eléctrica</option><option>Otro</option></select></div><div class="form-row"><label>Estado</label><select id="invEstado"><option>Operativo</option><option>En mantenimiento</option><option>Fuera de servicio</option></select></div></div><div class="form-row"><label>Ubicación</label><input id="invUbicacion"/></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem"><button onclick="closeModal('invModal')">Cancelar</button><button class="primary" onclick="saveInv()">Guardar</button></div></div></div>
+<div id="mantModal" class="modal-bg hidden"><div class="modal"><h3>Programar mantenimiento</h3><div class="form-row"><label>Equipo</label><select id="mantEquipo"></select></div><div class="grid2"><div class="form-row"><label>Fecha</label><input type="date" id="mantFecha"/></div><div class="form-row"><label>Tipo</label><select id="mantTipo"><option>Preventivo</option><option>Correctivo</option><option>Limpieza</option><option>Revisión general</option></select></div></div><div class="form-row"><label>Técnico</label><input id="mantTecnico"/></div><div class="form-row"><label>Descripción</label><textarea id="mantDesc" rows="2"></textarea></div><div class="form-row"><label>Estado</label><select id="mantEstado"><option>Pendiente</option><option>En proceso</option><option>Completado</option><option>Cancelado</option></select></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem"><button onclick="closeModal('mantModal')">Cancelar</button><button class="primary" onclick="saveMant()">Guardar</button></div></div></div>
+<div id="incModal" class="modal-bg hidden"><div class="modal"><h3>Reportar incidencia</h3><div class="form-row"><label>Equipo</label><select id="incEquipo"></select></div><div class="grid2"><div class="form-row"><label>Prioridad</label><select id="incPrioridad"><option>Alta</option><option>Media</option><option>Baja</option></select></div><div class="form-row"><label>Tipo</label><select id="incTipo"><option>Falla mecánica</option><option>Falla eléctrica</option><option>Fuga</option><option>Ruido anormal</option><option>No enciende</option><option>Otro</option></select></div></div><div class="form-row"><label>Descripción</label><textarea id="incDesc" rows="2"></textarea></div><div class="form-row"><label>Estado</label><select id="incEstado"><option>Abierta</option><option>En atención</option><option>Resuelta</option></select></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem"><button onclick="closeModal('incModal')">Cancelar</button><button class="primary" onclick="saveInc()">Reportar</button></div></div></div>
+<div id="matModal" class="modal-bg hidden"><div class="modal"><h3>Solicitud de materiales</h3><div class="form-row"><label>Material</label><input id="matNombre"/></div><div class="grid2"><div class="form-row"><label>Cantidad</label><input type="number" id="matCantidad" min="1"/></div><div class="form-row"><label>Unidad</label><select id="matUnidad"><option>pieza</option><option>litro</option><option>metro</option><option>caja</option><option>kg</option><option>rollo</option><option>juego</option></select></div></div><div class="form-row"><label>Justificación</label><textarea id="matUso" rows="2"></textarea></div><div class="grid2"><div class="form-row"><label>Prioridad</label><select id="matPrioridad"><option>Urgente</option><option>Normal</option><option>Baja</option></select></div><div class="form-row"><label>Estado</label><select id="matEstado"><option>Solicitado</option><option>Aprobado</option><option>Entregado</option><option>Rechazado</option></select></div></div><div style="border-top:1px solid var(--border);margin:1rem 0"></div><div style="font-size:13px;font-weight:600;margin-bottom:.75rem">Cotización</div><div class="form-row"><label>Proveedor</label><input id="matProveedor"/></div><div class="grid3"><div class="form-row"><label>Subtotal s/IVA $</label><input type="number" id="matSubtotal" step="0.01" min="0" oninput="calcIVA()"/></div><div class="form-row"><label>IVA 16% $</label><input type="number" id="matIva" readonly style="background:var(--surface4);color:var(--text2)"/></div><div class="form-row"><label>Total c/IVA $</label><input type="number" id="matTotal" readonly style="background:var(--surface4);color:var(--accent);font-weight:500"/></div></div><div id="cotizSummary" class="cotiz-box hidden"><div class="cotiz-row"><span>Subtotal sin IVA</span><span id="sumSubtotal"></span></div><div class="cotiz-row"><span>IVA 16%</span><span id="sumIva"></span></div><div class="cotiz-row total"><span style="font-size:13px;font-weight:500;color:var(--text1)">Total con IVA</span><span id="sumTotal"></span></div></div><div class="form-row" style="margin-top:1rem"><label>Imágenes de cotización (máx. 5)</label><div class="img-upload-zone"><input type="file" id="matImgs" accept="image/*" multiple onchange="handleImgUpload(event)"/><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5" style="margin:0 auto 8px;display:block"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><div style="font-size:12px;color:var(--text2)">Arrastra o selecciona imágenes</div></div><div class="img-thumbs" id="imgThumbs"></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem"><button onclick="closeModal('matModal')">Cancelar</button><button class="primary" onclick="saveMat()">Enviar solicitud</button></div></div></div>
+<!-- Encargado edit modal -->
+<div id="encModal" class="modal-bg hidden"><div class="modal"><h3 id="encModalTitle">Encargado de mantenimiento</h3><div class="form-row"><label>Nombre completo</label><input id="encNombre" placeholder="Ej: Juan Carlos Pérez"/></div><div class="form-row"><label>Puesto / cargo</label><input id="encPuesto" placeholder="Ej: Jefe de Mantenimiento"/></div><div class="form-row"><label>Teléfono</label><input id="encTel" placeholder="+52 999 123 4567"/></div><div class="form-row"><label>Correo</label><input id="encEmail" placeholder="jperez@royalty.com"/></div><div class="form-row"><label>Notas</label><textarea id="encNotas" rows="2" placeholder="Turno, especialidad, observaciones..."></textarea></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem"><button onclick="closeModal('encModal')">Cancelar</button><button class="primary" onclick="saveEncargado()">Guardar encargado</button></div></div></div>
+<!-- Email modal -->
+<div id="emailModal" class="modal-bg hidden"><div class="modal"><h3>Enviar reporte por correo</h3><div class="form-row"><label>Destinatario</label><input id="emailTo" placeholder="pagos@royaltycasino.com"/></div><div class="form-row"><label>Asunto</label><input id="emailSubject"/></div><div class="form-row"><label>Vista previa</label><div class="email-preview" id="emailPreview"></div></div><div style="background:rgba(77,159,255,.07);border:1px solid rgba(77,159,255,.2);border-radius:var(--radius);padding:.75rem 1rem;font-size:12px;color:var(--blue);margin-bottom:1rem">Envío simulado. Conecta SMTP o EmailJS para envío real.</div><div style="display:flex;gap:8px;justify-content:flex-end"><button onclick="closeModal('emailModal')">Cancelar</button><button class="primary" onclick="sendEmailReport()">Enviar reporte</button></div></div></div>
+<!-- Pass modal -->
+<div id="passModal" class="modal-bg hidden"><div class="modal"><h3 id="passModalTitle">Cambiar contraseña</h3><div class="form-row"><label>Nueva contraseña</label><input type="password" id="newPass1"/></div><div class="form-row"><label>Confirmar</label><input type="password" id="newPass2"/></div><div id="passModalMsg" style="font-size:12px;margin-bottom:8px"></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem"><button onclick="closeModal('passModal')">Cancelar</button><button class="primary" onclick="savePassModal()">Actualizar</button></div></div></div>
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox hidden"><button class="lightbox-close" onclick="closeLightbox()">×</button><img id="lightboxImg" src="" alt=""/></div>
+<!-- Notif -->
+<div id="notifBanner" class="notif-banner hidden slide-in">
+  <div style="display:flex;align-items:flex-start;gap:10px">
+    <div id="notifIcon" style="flex-shrink:0;margin-top:2px"></div>
+    <div style="flex:1"><div id="notifTitle" style="font-size:13px;font-weight:600;margin-bottom:3px"></div><div id="notifBody" style="font-size:12px;color:var(--text2);line-height:1.5"></div></div>
+    <button onclick="document.getElementById('notifBanner').classList.add('hidden')" style="border:none;background:none;color:var(--text3);padding:0;font-size:16px">×</button>
+  </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// ═══════════════════════════════════════════
+// DATOS BASE
+// ═══════════════════════════════════════════
+const ZONAS=[
+  {id:'sur',name:'Zona Sur',cls:'zp-sur',color:'#ffb347'},
+  {id:'centro',name:'Zona Centro',cls:'zp-centro',color:'#4d9fff'},
+  {id:'norte',name:'Zona Norte',cls:'zp-norte',color:'#ff4d6a'},
+];
+const SUCS_DEFAULT=[
+  {id:'veracruz',name:'Veracruz',zona:'sur',pass:'veracruz'},
+  {id:'coatza',name:'Coatzacoalcos',zona:'sur',pass:'coatzacoalcos'},
+  {id:'villahermosa',name:'Villahermosa',zona:'sur',pass:'villahermosa'},
+  {id:'carmen',name:'Ciudad del Carmen',zona:'sur',pass:'ciudaddelcarmen'},
+  {id:'campeche',name:'Campeche',zona:'sur',pass:'campeche'},
+  {id:'tapachula',name:'Tapachula',zona:'sur',pass:'tapachula'},
+  {id:'cuspide',name:'Cúspide',zona:'centro',pass:'cuspide'},
+  {id:'guadalajara',name:'Guadalajara',zona:'centro',pass:'guadalajara'},
+  {id:'leon',name:'León',zona:'centro',pass:'leon'},
+  {id:'aguascalientes',name:'Aguascalientes',zona:'centro',pass:'aguascalientes'},
+  {id:'juarez',name:'Ciudad Juárez',zona:'norte',pass:'ciudadjuarez'},
+  {id:'navojoa',name:'Navojoa',zona:'norte',pass:'navojoa'},
+];
+
+let currentUser=null,currentSucursal=null,invTab='equipos',aprobTab='materiales',passEditId=null,encEditId=null,pendingImgs=[];
+let db={
+  inventario:[],mantenimientos:[],incidencias:[],materiales:[],
+  encargados:{},
+  notifConfig:{email:'',phone:'',phoneId:'',token:'',events:{nueva_solicitud:true,nueva_incidencia:true,nuevo_mantenimiento:true,cambio_inventario:true}},
+  passwords:{admin:'admin123'},
+  sucursales:[...SUCS_DEFAULT],
+  zonas:[...ZONAS],
+};
+db.sucursales.forEach(s=>{db.passwords[s.id]=s.pass;});
+
+// ═══════════════════════════════════════════
+// FIREBASE FIRESTORE — DATOS EN TIEMPO REAL
+// ═══════════════════════════════════════════
+const FB_CFG={
+  apiKey:"AIzaSyANmm-s7Hv02t9Wcl1oV1owz08NLDozvdE",
+  authDomain:"royalty-mantenimiento.firebaseapp.com",
+  projectId:"royalty-mantenimiento",
+  storageBucket:"royalty-mantenimiento.firebasestorage.app",
+  messagingSenderId:"569499949929",
+  appId:"1:569499949929:web:1c6ad3e4c4b7f737fe3bf8"
+};
+
+// Carga Firebase desde CDN
+let _db_firestore=null;
+let _fsDoc=null,_fsGetDoc=null,_fsSetDoc=null,_fsOnSnapshot=null;
+
+async function initFirebase(){
+  if(_db_firestore)return;
+  try{
+    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+    const {getFirestore,doc,getDoc,setDoc,onSnapshot}=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const app=getApps().length?getApps()[0]:initializeApp(FB_CFG);
+    _db_firestore=getFirestore(app);
+    _fsDoc=doc;_fsGetDoc=getDoc;_fsSetDoc=setDoc;_fsOnSnapshot=onSnapshot;
+  }catch(e){console.error('Firebase init error:',e);}
+}
+
+async function loadDB(){
+  await initFirebase();
+  try{
+    if(_db_firestore){
+      const ref=_fsDoc(_db_firestore,'royalty','maindb');
+      const snap=await _fsGetDoc(ref);
+      if(snap.exists()){
+        const sv=snap.data();
+        db={...db,...sv};
+      }
+      // Escucha cambios en tiempo real
+      _fsOnSnapshot(ref,(snap)=>{
+        if(snap.exists()&&currentUser){
+          const sv=snap.data();
+          const prev=JSON.stringify({inv:db.inventario,mant:db.mantenimientos,inc:db.incidencias,mat:db.materiales});
+          db={...db,...sv};
+          const next=JSON.stringify({inv:db.inventario,mant:db.mantenimientos,inc:db.incidencias,mat:db.materiales});
+          if(prev!==next)renderAll();
+        }
+      });
+    }
+  }catch(e){
+    console.warn('Firestore load error, usando localStorage:',e);
+    try{const v=localStorage.getItem('royalty_main_v1');if(v){const sv=JSON.parse(v);db={...db,...sv};}}catch(e2){}
+  }
+  if(!db.encargados)db.encargados={};
+  if(!db.sucursales||!db.sucursales.length)db.sucursales=[...SUCS_DEFAULT];
+  if(!db.zonas||!db.zonas.length)db.zonas=[...ZONAS];
+  db.sucursales.forEach(s=>{if(!db.passwords[s.id])db.passwords[s.id]=s.pass;});
+}
+
+async function saveDB(){
+  // Guarda en Firestore (fuente principal)
+  try{
+    await initFirebase();
+    if(_db_firestore){
+      // Las imágenes base64 son muy grandes para Firestore — las guardamos sin imágenes en la nube
+      const dbCloud={...db,materiales:db.materiales.map(m=>({...m,imgs:[]}))};
+      const ref=_fsDoc(_db_firestore,'royalty','maindb');
+      await _fsSetDoc(ref,dbCloud);
+    }
+  }catch(e){console.warn('Firestore save error:',e);}
+  // Siempre guarda en localStorage como respaldo (incluye imágenes)
+  try{localStorage.setItem('royalty_main_v1',JSON.stringify(db));}catch(e){}
+}
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+function findSuc(id){return db.sucursales.find(s=>s.id===id);}
+function getSName(id){if(id==='admin')return'Responsable General';const s=findSuc(id);return s?s.name:id;}
+function getZona(id){return db.zonas.find(z=>z.id===id)||{name:id,cls:'zp-custom',color:'#a87fff'};}
+function getSZone(id){const s=findSuc(id);return s?getZona(s.zona):null;}
+function fmt(n){return'$'+parseFloat(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function sBadge(s){const m={'Operativo':'b-green','En mantenimiento':'b-amber','Fuera de servicio':'b-red','Pendiente':'b-amber','En proceso':'b-blue','Completado':'b-green','Cancelado':'b-gray','Abierta':'b-red','En atención':'b-amber','Resuelta':'b-green','Solicitado':'b-amber','Aprobado':'b-blue','Entregado':'b-green','Rechazado':'b-red','Alta':'b-red','Media':'b-amber','Baja':'b-green','Urgente':'b-red','Normal':'b-blue'};return`<span class="badge ${m[s]||'b-gray'}">${s}</span>`;}
+function zpHtml(sid){const z=getSZone(sid);if(!z)return'';return`<span class="zone-pill ${z.cls}" style="font-size:9px;padding:1px 6px">${z.name}</span>`;}
+function sucCell(sid){return`<td><div style="display:flex;flex-direction:column;gap:3px"><span style="font-size:12px">${getSName(sid)}</span>${zpHtml(sid)}</div></td>`;}
+function emptyState(msg){return`<div class="empty"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>${msg}</p></div>`;}
+function mkTable(cols,rows){if(!rows.length)return emptyState('Sin registros.');return`<table><thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;}
+function avatarColor(name){const colors=['#00C48C','#4d9fff','#ffb347','#a87fff','#ff4d6a','#00d4ff'];let h=0;for(let c of(name||'?'))h+=c.charCodeAt(0);return colors[h%colors.length];}
+function initials(name){return(name||'?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+
+// ═══════════════════════════════════════════
+// LOGIN / LOGOUT
+// ═══════════════════════════════════════════
+function buildLoginSelect(){
+  const sl=document.getElementById('loginSucursal');
+  sl.innerHTML='<option value="">— Selecciona tu sucursal —</option><option value="admin">Cuenta General (Responsable)</option>'+
+    db.zonas.map(z=>`<optgroup label="⬡ ${z.name}">${db.sucursales.filter(s=>s.zona===z.id).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</optgroup>`).join('');
+}
+
+async function doLogin(){
+  const sel=document.getElementById('loginSucursal').value;
+  const pass=document.getElementById('loginPass').value;
+  if(!sel)return;
+  await loadDB();
+  let ok=false;
+  if(sel==='admin'&&pass===db.passwords.admin)ok=true;
+  else{const pw=db.passwords[sel];if(pw&&pass===pw)ok=true;}
+  if(!ok){document.getElementById('loginError').style.display='block';return;}
+  document.getElementById('loginError').style.display='none';
+  currentUser=sel==='admin'?'admin':sel;
+  showApp();
+}
+
+function doLogout(){
+  currentUser=null;currentSucursal=null;
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginSucursal').value='';
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('mainApp').classList.add('hidden');
+}
+
+function showApp(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  const isAdmin=currentUser==='admin';
+  const rb=document.getElementById('roleBadge');rb.textContent=isAdmin?'Responsable General':getSName(currentUser);rb.className='badge '+(isAdmin?'b-blue':'b-green');
+  const zb=document.getElementById('zoneBadge');
+  if(!isAdmin){const z=getSZone(currentUser);if(z){zb.textContent=z.name;zb.className='zone-pill '+z.cls;zb.classList.remove('hidden');}}else zb.classList.add('hidden');
+  document.getElementById('headerSub').textContent=isAdmin?'Vista General — Todas las sucursales':getSName(currentUser);
+  const ab=document.getElementById('adminBar');
+  if(isAdmin){
+    ab.classList.remove('hidden');
+    const av=document.getElementById('adminView');
+    av.innerHTML='<option value="all">Todas las sucursales</option>'+db.zonas.map(z=>`<optgroup label="${z.name}">${db.sucursales.filter(s=>s.zona===z.id).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</optgroup>`).join('');
+    currentSucursal='all';
+    ['nav-aprobaciones','nav-reportes','nav-encargados','nav-notificaciones','nav-contrasenas'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='flex';});
+    document.getElementById('adminSection').style.display='block';
+  }else{
+    ab.classList.add('hidden');currentSucursal=currentUser;
+    ['nav-aprobaciones','nav-reportes','nav-encargados','nav-notificaciones','nav-contrasenas'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    document.getElementById('adminSection').style.display='none';
+  }
+  buildReportFilters();loadNotifConfig();
+  showMod('dashboard',document.getElementById('nav-dashboard'));
+}
+
+function switchAdminView(){currentSucursal=document.getElementById('adminView').value;renderAll();}
+function getActiveSid(){return currentUser==='admin'?document.getElementById('adminView').value:currentUser;}
+function filterS(arr){const sid=getActiveSid();if(sid==='all')return arr;return arr.filter(x=>x.sucursal===sid);}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function showMod(mod,btn){
+  ['dashboard','aprobaciones','reportes','inventario','mantenimientos','incidencias','materiales','encargados','notificaciones','contrasenas'].forEach(m=>{
+    const el=document.getElementById('mod-'+m);
+    if(el){if(m===mod){el.classList.remove('hidden');el.classList.add('fade-up');}else el.classList.add('hidden');}
+  });
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderAll();
+}
+function setTab(btn){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');}
+
+// ═══════════════════════════════════════════
+// ENCARGADOS
+// ═══════════════════════════════════════════
+function renderEncargados(){
+  const el=document.getElementById('encargadosList');if(!el)return;
+  el.innerHTML=db.zonas.map(z=>{
+    const sucs=db.sucursales.filter(s=>s.zona===z.id);
+    return`<div class="card" style="margin-bottom:1rem">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
+        <span class="zone-pill ${z.cls}">${z.name}</span>
+      </div>
+      ${sucs.map(s=>{
+        const enc=db.encargados[s.id];
+        return`<div class="encargado-card">
+          <div class="enc-avatar" style="background:${avatarColor(enc?.nombre||s.name)}">${enc?initials(enc.nombre):'?'}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">${s.name}</div>
+            ${enc?`
+              <div style="font-size:13px;color:var(--text1);margin-top:2px">${enc.nombre}</div>
+              <div style="font-size:12px;color:var(--text2)">${enc.puesto||''}${enc.tel?` · ${enc.tel}`:''}</div>
+              ${enc.email?`<div style="font-size:11px;color:var(--text3)">${enc.email}</div>`:''}
+            `:`<div style="font-size:12px;color:var(--text3);margin-top:2px;font-style:italic">Sin encargado asignado</div>`}
+          </div>
+          <div style="display:flex;gap:6px">
+            <button onclick="openEncModal('${s.id}')" style="font-size:12px;padding:5px 12px">${enc?'Editar':'Asignar'}</button>
+            ${enc?`<button onclick="deleteEncargado('${s.id}')" style="font-size:12px;padding:5px 12px;color:var(--red);border-color:rgba(255,77,106,.2)">Quitar</button>`:''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+function openEncModal(sucId){
+  encEditId=sucId;
+  const s=findSuc(sucId);
+  document.getElementById('encModalTitle').textContent=`Encargado — ${s?.name||sucId}`;
+  const enc=db.encargados[sucId]||{};
+  document.getElementById('encNombre').value=enc.nombre||'';
+  document.getElementById('encPuesto').value=enc.puesto||'';
+  document.getElementById('encTel').value=enc.tel||'';
+  document.getElementById('encEmail').value=enc.email||'';
+  document.getElementById('encNotas').value=enc.notas||'';
+  openModal('encModal');
+}
+
+async function saveEncargado(){
+  const nombre=document.getElementById('encNombre').value.trim();
+  if(!nombre){alert('Ingresa el nombre del encargado');return;}
+  db.encargados[encEditId]={
+    nombre,
+    puesto:document.getElementById('encPuesto').value,
+    tel:document.getElementById('encTel').value,
+    email:document.getElementById('encEmail').value,
+    notas:document.getElementById('encNotas').value,
+    updatedAt:new Date().toLocaleDateString('es-MX'),
+  };
+  await saveDB();closeModal('encModal');renderEncargados();
+  showNotif('success','✓ Encargado guardado',`${nombre} asignado a ${getSName(encEditId)}`);
+  renderDashboard();
+}
+
+async function deleteEncargado(sucId){
+  const enc=db.encargados[sucId];
+  if(!confirm(`¿Quitar a ${enc?.nombre} como encargado?`))return;
+  delete db.encargados[sucId];
+  await saveDB();renderEncargados();renderDashboard();
+}
+
+// ═══════════════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════════════
+function renderAll(){renderDashboard();renderInv();renderMant();renderInc();renderMat();if(currentUser==='admin'){renderAprobaciones();renderReportes();renderEncargados();renderPassTable();renderNotifEvents();updateAprobDot();}}
+
+function renderDashboard(){
+  const inv=filterS(db.inventario),mant=filterS(db.mantenimientos),inc=filterS(db.incidencias),mat=filterS(db.materiales);
+  const pend=mat.filter(x=>x.estado==='Solicitado').length+inc.filter(x=>x.estado==='Abierta').length+mant.filter(x=>x.estado==='Pendiente').length;
+  document.getElementById('dashStats').innerHTML=[
+    {n:inv.length,l:'Equipos',c:'c-green'},{n:mant.filter(x=>x.estado==='Pendiente').length,l:'Mant. pendientes',c:'c-amber'},
+    {n:inc.filter(x=>x.estado==='Abierta').length,l:'Incidencias',c:'c-red'},{n:mat.filter(x=>x.estado==='Solicitado').length,l:'Solicitudes',c:'c-blue'}
+  ].map(s=>`<div class="stat-card ${s.c}"><div class="stat-num">${s.n}</div><div class="stat-label">${s.l}</div></div>`).join('');
+  const pa=document.getElementById('pendingAlert');
+  if(currentUser==='admin'&&pend>0){pa.classList.remove('hidden');pa.style.display='flex';document.getElementById('pendingAlertText').textContent=`${pend} elemento${pend>1?'s':''} pendiente${pend>1?'s':''} de autorización`;}else pa.classList.add('hidden');
+  const prox=mant.filter(x=>x.estado!=='Completado'&&x.estado!=='Cancelado').slice(0,5);
+  document.getElementById('dashProximos').innerHTML=prox.length?prox.map(m=>`<div style="padding:9px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:500">${m.equipo}</div><div style="font-size:11px;color:var(--text3);margin-top:2px">${m.fecha} · ${getSName(m.sucursal)} ${zpHtml(m.sucursal)}</div></div>${sBadge(m.estado)}</div>`).join(''):emptyState('Sin mantenimientos programados');
+  document.getElementById('dashIncidencias').innerHTML=inc.slice(-5).reverse().map(i=>`<div style="padding:9px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:500">${i.equipo}</div><div style="font-size:11px;color:var(--text3);margin-top:2px">${i.tipo} · ${getSName(i.sucursal)} ${zpHtml(i.sucursal)}</div></div>${sBadge(i.prioridad)}</div>`).join('')||emptyState('Sin incidencias');
+  // Encargado card for sucursal view
+  const ec=document.getElementById('encargadoCard');
+  if(currentUser!=='admin'){
+    const enc=db.encargados[currentUser];
+    if(enc){
+      ec.classList.remove('hidden');
+      ec.innerHTML=`<div class="card" style="display:flex;align-items:center;gap:14px;background:rgba(0,196,140,.04);border-color:rgba(0,196,140,.15)">
+        <div class="enc-avatar" style="background:${avatarColor(enc.nombre)};width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;color:#0a1a12;flex-shrink:0">${initials(enc.nombre)}</div>
+        <div>
+          <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:2px">Encargado de mantenimiento</div>
+          <div style="font-size:15px;font-weight:600">${enc.nombre}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">${enc.puesto||''}${enc.tel?` · ${enc.tel}`:''}</div>
+        </div>
+      </div>`;
+    }else ec.classList.add('hidden');
+  }else ec.classList.add('hidden');
+}
+
+function renderAprobaciones(){const el=document.getElementById('aprobContent');if(!el)return;let items=aprobTab==='materiales'?db.materiales:(aprobTab==='incidencias'?db.incidencias:db.mantenimientos);if(!items.length){el.innerHTML=emptyState('Sin registros');return;}el.innerHTML=items.map((item,idx)=>{const isMat=aprobTab==='materiales',isInc=aprobTab==='incidencias';const titleTxt=isMat?item.nombre:(item.equipo||'—');const detailTxt=isMat?`${item.cantidad} ${item.unidad} — ${item.uso}`:(isInc?`${item.tipo}: ${item.desc}`:`${item.tipo} — ${item.fecha} — ${item.tecnico||'—'}`);const sc=item.estado==='Aprobado'||item.estado==='Resuelta'||item.estado==='Completado'?'approved':(item.estado==='Rechazado'||item.estado==='Cancelado'?'rejected':'pending');const canAct=sc==='pending';const hasCotiz=isMat&&item.subtotal>0;const hasImgs=isMat&&item.imgs&&item.imgs.length>0;return`<div class="approval-card ${sc}"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem"><div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:13px;font-weight:600">${titleTxt}</span>${isMat?sBadge(item.prioridad):''}</div><div style="font-size:12px;color:var(--text2);margin-bottom:6px">${detailTxt}</div>${hasCotiz?`<div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:12px;color:var(--text2)">Sin IVA: <strong>${fmt(item.subtotal)}</strong></span><span class="iva-badge">+IVA</span><span style="font-size:12px;color:var(--text2)">Total: <strong style="color:var(--accent)">${fmt(item.totalConIva)}</strong></span>${item.proveedor?`<span style="font-size:11px;color:var(--text3)">${item.proveedor}</span>`:''}</div>`:''} ${hasImgs?`<div style="display:flex;gap:6px;margin-bottom:8px">${item.imgs.map(s=>`<div style="width:54px;height:40px;border-radius:6px;overflow:hidden;cursor:pointer;border:1px solid var(--border2)" onclick="openLightbox('${s}')"><img src="${s}" style="width:100%;height:100%;object-fit:cover"/></div>`).join('')}</div>`:''}<div style="display:flex;align-items:center;gap:8px">${sBadge(item.estado)}<span style="font-size:11px;color:var(--text3)">${getSName(item.sucursal)}</span>${zpHtml(item.sucursal)}</div></div>${canAct?`<div style="display:flex;gap:6px;flex-shrink:0"><button class="approve" onclick="approveItem('${aprobTab}',${idx})">✓ Aprobar</button><button class="reject" onclick="rejectItem('${aprobTab}',${idx})">✗ Rechazar</button></div>`:`<div style="font-size:11px;color:var(--text3)">${item.estado}</div>`}</div></div>`;}).join('');}
+async function approveItem(tab,idx){const arr=tab==='materiales'?db.materiales:(tab==='incidencias'?db.incidencias:db.mantenimientos);const item=arr[idx];if(tab==='materiales')item.estado='Aprobado';else if(tab==='incidencias')item.estado='En atención';else item.estado='En proceso';await saveDB();renderAll();}
+async function rejectItem(tab,idx){const arr=tab==='materiales'?db.materiales:(tab==='incidencias'?db.incidencias:db.mantenimientos);const item=arr[idx];if(tab==='materiales')item.estado='Rechazado';else if(tab==='incidencias')item.estado='Resuelta';else item.estado='Cancelado';await saveDB();renderAll();}
+function updateAprobDot(){const p=db.materiales.filter(x=>x.estado==='Solicitado').length+db.incidencias.filter(x=>x.estado==='Abierta').length+db.mantenimientos.filter(x=>x.estado==='Pendiente').length;const dot=document.getElementById('aprobDot');if(dot){if(p>0)dot.classList.remove('hidden');else dot.classList.add('hidden');}}
+
+function renderInv(){const isA=currentUser==='admin';const data=filterS(db.inventario).filter(x=>invTab==='equipos'?x.tipo==='equipo':x.tipo==='herramienta');document.getElementById('invTitle').textContent=`${invTab==='equipos'?'Equipos':'Herramientas'} (${data.length})`;const cols=['Nombre','Marca/Modelo','Serie','Categoría',...(isA?['Sucursal']:[]),'Ubicación','Estado'];const rows=data.map(r=>`<tr><td style="font-weight:500">${r.nombre}</td><td style="color:var(--text2)">${r.modelo||'—'}</td><td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)">${r.serie||'—'}</td><td>${r.categoria}</td>${isA?sucCell(r.sucursal):''}<td style="color:var(--text2)">${r.ubicacion||'—'}</td><td>${sBadge(r.estado)}</td></tr>`).join('');document.getElementById('invTable').innerHTML=mkTable(cols,rows);}
+function renderMant(){const isA=currentUser==='admin';const data=filterS(db.mantenimientos);const cols=['Equipo','Tipo','Fecha','Técnico',...(isA?['Sucursal']:[]),'Estado'];const rows=data.map(r=>`<tr><td style="font-weight:500">${r.equipo}</td><td>${r.tipo}</td><td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2)">${r.fecha}</td><td style="color:var(--text2)">${r.tecnico||'—'}</td>${isA?sucCell(r.sucursal):''}<td>${sBadge(r.estado)}</td></tr>`).join('');document.getElementById('mantTable').innerHTML=mkTable(cols,rows);}
+function renderInc(){const isA=currentUser==='admin';const data=filterS(db.incidencias);const cols=['Equipo','Tipo','Descripción',...(isA?['Sucursal']:[]),'Prioridad','Estado'];const rows=data.map(r=>`<tr><td style="font-weight:500">${r.equipo}</td><td>${r.tipo}</td><td style="color:var(--text2);font-size:12px;max-width:150px">${r.desc}</td>${isA?sucCell(r.sucursal):''}<td>${sBadge(r.prioridad)}</td><td>${sBadge(r.estado)}</td></tr>`).join('');document.getElementById('incTable').innerHTML=mkTable(cols,rows);}
+function renderMat(){const isA=currentUser==='admin';const data=filterS(db.materiales);const cols=['Material','Cantidad','Proveedor','Sin IVA','Con IVA','Imgs',...(isA?['Sucursal']:[]),'Prioridad','Estado'];const rows=data.map(r=>`<tr><td style="font-weight:500">${r.nombre}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${r.cantidad} ${r.unidad}</td><td style="color:var(--text2);font-size:12px">${r.proveedor||'—'}</td><td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2)">${r.subtotal?fmt(r.subtotal):'—'}</td><td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);font-weight:500">${r.totalConIva?fmt(r.totalConIva):'—'}</td><td>${r.imgs&&r.imgs.length?`<div style="display:flex;gap:3px">${r.imgs.slice(0,2).map(s=>`<div style="width:28px;height:20px;border-radius:3px;overflow:hidden;cursor:pointer" onclick="openLightbox('${s}')"><img src="${s}" style="width:100%;height:100%;object-fit:cover"/></div>`).join('')}${r.imgs.length>2?`<span style="font-size:10px;color:var(--text3);align-self:center">+${r.imgs.length-2}</span>`:''}</div>`:'—'}</td>${isA?sucCell(r.sucursal):''}<td>${sBadge(r.prioridad)}</td><td>${sBadge(r.estado)}</td></tr>`).join('');document.getElementById('matTable').innerHTML=mkTable(cols,rows);}
+
+// ═══════════════════════════════════════════
+// REPORTES
+// ═══════════════════════════════════════════
+function buildReportFilters(){const rs=document.getElementById('rptSucursal');if(!rs)return;rs.innerHTML='<option value="all">Todas las sucursales</option>'+db.zonas.map(z=>`<optgroup label="${z.name}">${db.sucursales.filter(s=>s.zona===z.id).map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</optgroup>`).join('');}
+function getDateFilter(){const p=document.getElementById('rptPeriodo')?.value||'todo';const now=new Date();if(p==='semana'){const d=new Date(now);d.setDate(d.getDate()-7);return d.toISOString().split('T')[0];}if(p==='mes'){const d=new Date(now);d.setMonth(d.getMonth()-1);return d.toISOString().split('T')[0];}if(p==='trimestre'){const d=new Date(now);d.setMonth(d.getMonth()-3);return d.toISOString().split('T')[0];}return null;}
+function filterByDate(arr,f='fecha'){const from=getDateFilter();if(!from)return arr;return arr.filter(x=>(x[f]||'')>=from);}
+function filterBySucRpt(arr){const sid=document.getElementById('rptSucursal')?.value||'all';if(sid==='all')return arr;return arr.filter(x=>x.sucursal===sid);}
+function getRptData(){return{mats:filterByDate(filterBySucRpt(db.materiales)),incs:filterByDate(filterBySucRpt(db.incidencias)),mants:filterByDate(filterBySucRpt(db.mantenimientos))};}
+
+function renderReportes(){
+  const el=document.getElementById('rptContent');if(!el)return;
+  const tipo=document.getElementById('rptTipo')?.value||'gastos';
+  const{mats,incs,mants}=getRptData();
+  const sidFilt=document.getElementById('rptSucursal')?.value||'all';
+  const sucList=sidFilt==='all'?db.sucursales:[findSuc(sidFilt)].filter(Boolean);
+
+  if(tipo==='gastos'){
+    const tot=mats.reduce((a,m)=>a+(m.totalConIva||0),0);const apr=mats.filter(m=>m.estado==='Aprobado'||m.estado==='Entregado').reduce((a,m)=>a+(m.totalConIva||0),0);const sinIva=mats.reduce((a,m)=>a+(m.subtotal||0),0);const pend=mats.filter(m=>m.estado==='Solicitado').reduce((a,m)=>a+(m.totalConIva||0),0);
+    const byS=sucList.map(s=>{const sm=mats.filter(m=>m.sucursal===s.id);const v=sm.reduce((a,m)=>a+(m.totalConIva||0),0);return{id:s.id,label:s.name,val:v};}).filter(x=>x.val>0).sort((a,b)=>b.val-a.val);
+    const maxV=byS.length?byS[0].val:1;
+    const ZONE_C={veracruz:'#ffb347',coatza:'#ffa020',villahermosa:'#ff8c00',carmen:'#ff7000',campeche:'#f06000',tapachula:'#e05000',cuspide:'#4d9fff',guadalajara:'#2b7de0',leon:'#1a6cc9',aguascalientes:'#0f5ab5',juarez:'#ff4d6a',navojoa:'#cc2244'};
+    el.innerHTML=`<div class="grid4" style="margin-bottom:1rem">${[{n:fmt(tot),l:'Total c/IVA',c:'c-blue'},{n:fmt(apr),l:'Aprobado',c:'c-green'},{n:fmt(pend),l:'Pendiente',c:'c-amber'},{n:fmt(sinIva),l:'Sin IVA',c:'c-purple'}].map(s=>`<div class="stat-card ${s.c}"><div class="stat-num" style="font-size:16px">${s.n}</div><div class="stat-label">${s.l}</div></div>`).join('')}</div><div class="chart-wrap"><div class="chart-title">Gasto por sucursal c/IVA</div>${byS.map(d=>`<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;color:var(--text2)">${d.label}</span><span style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500">${fmt(d.val)}</span></div><div style="background:var(--surface4);border-radius:5px;height:7px;overflow:hidden"><div style="height:100%;width:${Math.round((d.val/maxV)*100)}%;background:${ZONE_C[d.id]||'var(--accent)'};border-radius:5px;transition:width .6s ease"></div></div></div>`).join('')||'<p style="color:var(--text3);font-size:13px">Sin solicitudes en este período</p>'}</div><div class="card" style="padding:0;overflow:hidden">${mkTable(['Material','Proveedor','Sucursal','Sin IVA','Con IVA','Estado'],mats.map(m=>`<tr><td style="font-weight:500">${m.nombre}</td><td style="font-size:12px;color:var(--text2)">${m.proveedor||'—'}</td><td style="font-size:12px">${getSName(m.sucursal)}</td><td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text2)">${m.subtotal?fmt(m.subtotal):'—'}</td><td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent)">${m.totalConIva?fmt(m.totalConIva):'—'}</td><td>${sBadge(m.estado)}</td></tr>`))}</div>`;
+  }else if(tipo==='incidencias'){
+    el.innerHTML=`<div class="grid4" style="margin-bottom:1rem">${[{n:incs.length,l:'Total',c:'c-red'},{n:incs.filter(i=>i.prioridad==='Alta').length,l:'Prioridad alta',c:'c-amber'},{n:incs.filter(i=>i.estado==='Abierta').length,l:'Abiertas',c:'c-blue'},{n:incs.filter(i=>i.estado==='Resuelta').length,l:'Resueltas',c:'c-green'}].map(s=>`<div class="stat-card ${s.c}"><div class="stat-num">${s.n}</div><div class="stat-label">${s.l}</div></div>`).join('')}</div><div class="card" style="padding:0;overflow:hidden">${mkTable(['Equipo','Tipo','Descripción','Sucursal','Prioridad','Estado'],incs.map(i=>`<tr><td style="font-weight:500">${i.equipo}</td><td>${i.tipo}</td><td style="color:var(--text2);font-size:12px;max-width:140px">${i.desc}</td><td style="font-size:12px">${getSName(i.sucursal)}</td><td>${sBadge(i.prioridad)}</td><td>${sBadge(i.estado)}</td></tr>`))}</div>`;
+  }else if(tipo==='mantenimientos'){
+    el.innerHTML=`<div class="grid4" style="margin-bottom:1rem">${[{n:mants.length,l:'Total',c:'c-blue'},{n:mants.filter(m=>m.estado==='Completado').length,l:'Completados',c:'c-green'},{n:mants.filter(m=>m.estado==='Pendiente').length,l:'Pendientes',c:'c-amber'},{n:mants.filter(m=>m.estado==='En proceso').length,l:'En proceso',c:'c-purple'}].map(s=>`<div class="stat-card ${s.c}"><div class="stat-num">${s.n}</div><div class="stat-label">${s.l}</div></div>`).join('')}</div><div class="card" style="padding:0;overflow:hidden">${mkTable(['Equipo','Tipo','Fecha','Técnico','Sucursal','Estado'],mants.map(m=>`<tr><td style="font-weight:500">${m.equipo}</td><td>${m.tipo}</td><td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text2)">${m.fecha||'—'}</td><td style="color:var(--text2)">${m.tecnico||'—'}</td><td style="font-size:12px">${getSName(m.sucursal)}</td><td>${sBadge(m.estado)}</td></tr>`))}</div>`;
+  }else{
+    const now=new Date().toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    el.innerHTML=`<div style="background:rgba(0,196,140,.06);border:1px solid rgba(0,196,140,.15);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:14px;font-weight:600">Reporte Semanal — Mantenimiento Royalty</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${now}</div></div><span class="badge b-green">Semanal</span></div>`+sucList.map(s=>{const sm=mats.filter(m=>m.sucursal===s.id);const si=incs.filter(i=>i.sucursal===s.id);const smant=mants.filter(m=>m.sucursal===s.id);if(!sm.length&&!si.length&&!smant.length)return'';const enc=db.encargados[s.id];return`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:10px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px;font-weight:600">${s.name}</span>${zpHtml(s.id)}</div>${enc?`<span style="font-size:12px;color:var(--text2)">Enc: ${enc.nombre}</span>`:''}</div><div class="grid3" style="margin-bottom:.85rem">${[{n:sm.length,l:'Solicitudes',c:sm.length?'#4d9fff':'var(--text3)'},{n:si.filter(i=>i.estado==='Abierta').length,l:'Inc. abiertas',c:si.filter(i=>i.estado==='Abierta').length?'var(--red)':'var(--text3)'},{n:fmt(sm.reduce((a,m)=>a+(m.totalConIva||0),0)),l:'Gasto c/IVA',c:'var(--accent)'}].map(x=>`<div style="background:var(--surface3);border-radius:var(--radius);padding:.75rem"><div style="font-size:16px;font-weight:500;font-family:'DM Mono',monospace;color:${x.c}">${x.n}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px">${x.l}</div></div>`).join('')}</div>${sm.length?`<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Solicitudes</div>${mkTable(['Material','Proveedor','Sin IVA','Con IVA','Estado'],sm.map(m=>`<tr><td style="font-weight:500;font-size:12px">${m.nombre}</td><td style="font-size:11px;color:var(--text2)">${m.proveedor||'—'}</td><td style="font-family:'DM Mono',monospace;font-size:11px">${m.subtotal?fmt(m.subtotal):'—'}</td><td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent)">${m.totalConIva?fmt(m.totalConIva):'—'}</td><td>${sBadge(m.estado)}</td></tr>`))}`:''}${si.length?`<div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;margin-top:.75rem">Incidencias</div>${mkTable(['Equipo','Tipo','Prioridad','Estado'],si.map(i=>`<tr><td style="font-weight:500;font-size:12px">${i.equipo}</td><td>${i.tipo}</td><td>${sBadge(i.prioridad)}</td><td>${sBadge(i.estado)}</td></tr>`))}`:''}`;}).join('')||emptyState('Sin actividad registrada en este período');
+  }
+}
+
+function openEmailModal(){
+  const tipo=document.getElementById('rptTipo')?.value||'gastos';
+  const tipos={'gastos':'Gastos y Compras','incidencias':'Incidencias','mantenimientos':'Mantenimientos','semanal':'Resumen Semanal'};
+  const{mats,incs,mants}=getRptData();
+  const now=new Date().toLocaleDateString('es-MX');
+  let txt=`MANTENIMIENTO ROYALTY — Reporte ${tipos[tipo]}\nGenerado: ${now}\n${'─'.repeat(45)}\n\n`;
+  txt+=`Gastos totales c/IVA: ${fmt(mats.reduce((a,m)=>a+(m.totalConIva||0),0))}\n`;
+  txt+=`Incidencias: ${incs.length} (abiertas: ${incs.filter(i=>i.estado==='Abierta').length})\n`;
+  txt+=`Mantenimientos: ${mants.length} (pendientes: ${mants.filter(m=>m.estado==='Pendiente').length})\n\n`;
+  mats.forEach(m=>{txt+=`• ${m.nombre} | ${getSName(m.sucursal)} | ${m.totalConIva?fmt(m.totalConIva):'—'} c/IVA | ${m.estado}\n`;});
+  document.getElementById('emailSubject').value=`Mantenimiento Royalty — Reporte ${tipos[tipo]} — ${now}`;
+  document.getElementById('emailTo').value=db.notifConfig.email||'';
+  document.getElementById('emailPreview').textContent=txt;
+  openModal('emailModal');
+}
+function sendEmailReport(){const to=document.getElementById('emailTo').value;closeModal('emailModal');showNotif('email',`✉️ Enviado → ${to||'destinatario'}`,`Asunto: ${document.getElementById('emailSubject').value}\n(Simulado — integra SMTP para envío real)`);}
+
+function exportPDF(){
+  const{jsPDF}=window.jspdf;if(!jsPDF){showNotif('email','Cargando...','Espera un momento e intenta de nuevo');return;}
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const{mats,incs,mants}=getRptData();const now=new Date().toLocaleDateString('es-MX');
+  doc.setFillColor(15,17,23);doc.rect(0,0,210,28,'F');
+  doc.setTextColor(0,196,140);doc.setFontSize(15);doc.setFont('helvetica','bold');doc.text('Mantenimiento Royalty',14,13);
+  doc.setTextColor(139,147,167);doc.setFontSize(8);doc.setFont('helvetica','normal');doc.text('Casino & Aires Acondicionados',14,20);
+  doc.setTextColor(255,255,255);doc.setFontSize(8);doc.text(`Generado: ${now}`,196,14,{align:'right'});
+  let y=36;
+  doc.setFillColor(22,27,36);doc.rect(10,y-5,190,10,'F');
+  doc.setTextColor(0,196,140);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('Reporte de Gastos y Compras',14,y+1);y+=12;
+  const tot=mats.reduce((a,m)=>a+(m.totalConIva||0),0);const apr=mats.filter(m=>m.estado==='Aprobado'||m.estado==='Entregado').reduce((a,m)=>a+(m.totalConIva||0),0);
+  doc.setFillColor(30,37,53);doc.rect(10,y,90,18,'F');doc.rect(110,y,90,18,'F');
+  doc.setTextColor(0,196,140);doc.setFontSize(12);doc.setFont('helvetica','bold');doc.text('$'+tot.toLocaleString('es-MX',{maximumFractionDigits:2}),55,y+10,{align:'center'});doc.text('$'+apr.toLocaleString('es-MX',{maximumFractionDigits:2}),155,y+10,{align:'center'});
+  doc.setTextColor(139,147,167);doc.setFontSize(7);doc.setFont('helvetica','normal');doc.text('TOTAL SOLICITADO C/IVA',55,y+15,{align:'center'});doc.text('TOTAL APROBADO',155,y+15,{align:'center'});y+=26;
+  if(mats.length){doc.setFillColor(30,37,53);doc.rect(10,y,190,7,'F');doc.setTextColor(139,147,167);doc.setFontSize(7);['Material','Proveedor','Sucursal','Sin IVA','Con IVA','Estado'].forEach((h,i)=>{doc.text(h,[14,52,90,126,150,174][i],y+4.5);});y+=9;mats.forEach((m,idx)=>{if(y>265){doc.addPage();y=20;}if(idx%2===0){doc.setFillColor(22,27,36);doc.rect(10,y,190,7,'F');}doc.setTextColor(240,242,247);doc.setFontSize(7);doc.text(m.nombre.substring(0,22),14,y+4.5);doc.text((m.proveedor||'—').substring(0,15),52,y+4.5);doc.text(getSName(m.sucursal).substring(0,14),90,y+4.5);doc.setTextColor(139,147,167);doc.text(m.subtotal?m.subtotal.toFixed(2):'—',126,y+4.5);doc.setTextColor(0,196,140);doc.text(m.totalConIva?m.totalConIva.toFixed(2):'—',150,y+4.5);doc.setTextColor(240,242,247);doc.text(m.estado,174,y+4.5);y+=7;});}
+  const pages=doc.getNumberOfPages();for(let p=1;p<=pages;p++){doc.setPage(p);doc.setFillColor(15,17,23);doc.rect(0,283,210,14,'F');doc.setTextColor(80,92,115);doc.setFontSize(7);doc.text('Mantenimiento Royalty — Confidencial',14,291);doc.text(`Página ${p} de ${pages}`,196,291,{align:'right'});}
+  doc.save(`Royalty_Reporte_${now.replace(/\//g,'-')}.pdf`);
+}
+
+// ═══════════════════════════════════════════
+// NOTIFICACIONES
+// ═══════════════════════════════════════════
+function triggerNotif(evento,data){
+  if(currentUser==='admin')return;
+  const cfg=db.notifConfig;if(!cfg.events||!cfg.events[evento])return;
+  const sucName=getSName(currentUser);
+  const msgs={nueva_solicitud:`📦 Solicitud: ${sucName}\n${data.nombre} (${data.cantidad} ${data.unidad})\n${data.subtotal?fmt(data.subtotal)+' s/IVA | '+fmt(data.totalConIva)+' c/IVA':''}`,nueva_incidencia:`⚠️ Incidencia: ${sucName}\n${data.equipo} — ${data.tipo}\nPrioridad: ${data.prioridad}`,nuevo_mantenimiento:`🔧 Mantenimiento: ${sucName}\n${data.equipo} — ${data.tipo}\n${data.fecha}`,cambio_inventario:`📋 Inventario: ${sucName}\n${data.nombre} — ${data.categoria}`};
+  showNotif('email',`Correo → ${cfg.email||'(sin correo)'}`,msgs[evento]);
+  setTimeout(()=>{if(cfg.token&&cfg.phoneId&&cfg.phone)sendWAMessage(msgs[evento]);else showNotif('wa',`WhatsApp → ${cfg.phone||'(sin tel.)'}`,msgs[evento]);},1800);
+}
+let notifTimer=null;
+function showNotif(ch,title,body){clearTimeout(notifTimer);const b=document.getElementById('notifBanner');b.className='notif-banner slide-in '+(ch==='wa'?'wa':ch==='success'?'success':'email');document.getElementById('notifTitle').textContent=title;document.getElementById('notifBody').textContent=body;document.getElementById('notifIcon').innerHTML=ch==='wa'?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>':ch==='success'?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';b.classList.remove('hidden');notifTimer=setTimeout(()=>b.classList.add('hidden'),6000);}
+async function sendWAMessage(msg){const cfg=db.notifConfig;try{const res=await fetch(`https://graph.facebook.com/v19.0/${cfg.phoneId}/messages`,{method:'POST',headers:{'Authorization':`Bearer ${cfg.token}`,'Content-Type':'application/json'},body:JSON.stringify({messaging_product:'whatsapp',to:cfg.phone.replace(/\s/g,''),type:'text',text:{body:msg}})});const d=await res.json();showNotif('wa',d.messages?`✅ WA enviado → ${cfg.phone}`:`WA → ${cfg.phone}`,msg);}catch(e){showNotif('wa',`WA → ${cfg.phone}`,msg);}}
+function loadNotifConfig(){const c=db.notifConfig;['cfgEmail','cfgPhone','cfgPhoneId','cfgToken'].forEach(id=>{const el=document.getElementById(id);if(el){const key=id.replace('cfg','').toLowerCase();el.value=c[key]||'';}});}
+async function saveNotifConfig(){db.notifConfig.email=document.getElementById('cfgEmail').value;await saveDB();showNotif('success','✅ Guardado',`Correo: ${db.notifConfig.email}`);}
+async function saveWaConfig(){db.notifConfig.phone=document.getElementById('cfgPhone').value;db.notifConfig.phoneId=document.getElementById('cfgPhoneId').value;db.notifConfig.token=document.getElementById('cfgToken').value;await saveDB();showNotif('wa','✅ WA configurado',`Número: ${db.notifConfig.phone}`);}
+async function testWA(){const msg='🔔 Prueba — Mantenimiento Royalty\nNotificaciones activas.';if(db.notifConfig.token&&db.notifConfig.phoneId&&db.notifConfig.phone)await sendWAMessage(msg);else showNotif('wa',`WA → ${db.notifConfig.phone||'sin configurar'}`,msg);}
+function renderNotifEvents(){const el=document.getElementById('notifEventsList');if(!el)return;const evs=[{key:'nueva_solicitud',label:'Nueva solicitud de materiales'},{key:'nueva_incidencia',label:'Nueva incidencia reportada'},{key:'nuevo_mantenimiento',label:'Nuevo mantenimiento programado'},{key:'cambio_inventario',label:'Cambio en inventario'}];el.innerHTML=evs.map(e=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px">${e.label}</span><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" ${db.notifConfig.events&&db.notifConfig.events[e.key]?'checked':''} onchange="toggleEvent('${e.key}',this.checked)" style="width:auto;accent-color:var(--accent)"/><span style="font-size:12px;color:var(--text2)">Activo</span></label></div>`).join('');}
+async function toggleEvent(key,val){if(!db.notifConfig.events)db.notifConfig.events={};db.notifConfig.events[key]=val;await saveDB();}
+
+// ═══════════════════════════════════════════
+// CONTRASEÑAS
+// ═══════════════════════════════════════════
+function renderPassTable(){const el=document.getElementById('passTable');if(!el)return;el.innerHTML=db.zonas.map(z=>`<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:10px 0 6px">${z.name}</div>${db.sucursales.filter(s=>s.zona===z.id).map(s=>`<div class="pass-row"><div><div style="font-size:13px;font-weight:500">${s.name}</div><div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">${'•'.repeat((db.passwords[s.id]||'').length)} (${(db.passwords[s.id]||'').length} chars)</div></div><button onclick="openPassModal('${s.id}','${s.name}')" style="font-size:12px;padding:5px 12px">Cambiar</button></div>`).join('')}`).join('');}
+function openPassModal(id,name){passEditId=id;document.getElementById('passModalTitle').textContent=`Cambiar — ${name}`;document.getElementById('newPass1').value='';document.getElementById('newPass2').value='';document.getElementById('passModalMsg').textContent='';openModal('passModal');}
+async function savePassModal(){const p1=document.getElementById('newPass1').value,p2=document.getElementById('newPass2').value,msg=document.getElementById('passModalMsg');if(!p1){msg.style.color='var(--red)';msg.textContent='Ingresa una contraseña';return;}if(p1!==p2){msg.style.color='var(--red)';msg.textContent='No coinciden';return;}if(p1.length<4){msg.style.color='var(--red)';msg.textContent='Mínimo 4 caracteres';return;}db.passwords[passEditId]=p1;await saveDB();msg.style.color='var(--green)';msg.textContent='✓ Actualizada';setTimeout(()=>{closeModal('passModal');renderPassTable();},1200);}
+async function changeAdminPass(){const p1=document.getElementById('adminPass1').value,p2=document.getElementById('adminPass2').value,msg=document.getElementById('adminPassMsg');if(!p1||p1!==p2){msg.style.color='var(--red)';msg.textContent=!p1?'Ingresa contraseña':'No coinciden';return;}if(p1.length<4){msg.style.color='var(--red)';msg.textContent='Mínimo 4 caracteres';return;}db.passwords.admin=p1;await saveDB();msg.style.color='var(--green)';msg.textContent='✓ Actualizada';document.getElementById('adminPass1').value='';document.getElementById('adminPass2').value='';}
+
+// ═══════════════════════════════════════════
+// MODALS / FORMS
+// ═══════════════════════════════════════════
+function openModal(id){if(id==='mantModal'||id==='incModal'){const eq=filterS(db.inventario).filter(x=>x.tipo==='equipo').map(e=>`<option>${e.nombre}</option>`).join('');document.getElementById(id==='mantModal'?'mantEquipo':'incEquipo').innerHTML=eq||'<option>Sin equipos</option>';}if(id==='matModal'){pendingImgs=[];renderThumbs();['matNombre','matProveedor','matSubtotal','matIva','matTotal'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});const cs=document.getElementById('cotizSummary');if(cs)cs.classList.add('hidden');}document.getElementById(id).classList.remove('hidden');}
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+function resolveSid(){const sid=getActiveSid();return(!sid||sid==='all')?db.sucursales[0]?.id||'veracruz':(sid||currentUser);}
+function calcIVA(){const sub=parseFloat(document.getElementById('matSubtotal').value)||0;const iva=sub*0.16;const total=sub+iva;document.getElementById('matIva').value=iva.toFixed(2);document.getElementById('matTotal').value=total.toFixed(2);const box=document.getElementById('cotizSummary');if(sub>0){box.classList.remove('hidden');document.getElementById('sumSubtotal').textContent=fmt(sub);document.getElementById('sumIva').textContent=fmt(iva);document.getElementById('sumTotal').textContent=fmt(total);}else box.classList.add('hidden');}
+function handleImgUpload(e){const files=Array.from(e.target.files);const rem=5-pendingImgs.length;files.slice(0,rem).forEach(f=>{const r=new FileReader();r.onload=ev=>{pendingImgs.push(ev.target.result);renderThumbs();};r.readAsDataURL(f);});e.target.value='';}
+function renderThumbs(){const c=document.getElementById('imgThumbs');c.innerHTML=pendingImgs.map((src,i)=>`<div class="img-thumb"><img src="${src}" onclick="openLightbox('${src}')"/><button class="img-thumb-del" onclick="removeImg(${i})">×</button></div>`).join('');}
+function removeImg(i){pendingImgs.splice(i,1);renderThumbs();}
+function openLightbox(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.remove('hidden');}
+function closeLightbox(){document.getElementById('lightbox').classList.add('hidden');document.getElementById('lightboxImg').src='';}
+
+async function saveInv(){const item={tipo:document.getElementById('invTipo').value,nombre:document.getElementById('invNombre').value||'Sin nombre',modelo:document.getElementById('invModelo').value,serie:document.getElementById('invSerie').value,categoria:document.getElementById('invCategoria').value,estado:document.getElementById('invEstado').value,ubicacion:document.getElementById('invUbicacion').value,sucursal:resolveSid(),fecha:new Date().toISOString().split('T')[0]};db.inventario.push(item);await saveDB();closeModal('invModal');triggerNotif('cambio_inventario',item);renderAll();}
+async function saveMant(){const item={equipo:document.getElementById('mantEquipo').value||'No especificado',fecha:document.getElementById('mantFecha').value||new Date().toISOString().split('T')[0],tipo:document.getElementById('mantTipo').value,tecnico:document.getElementById('mantTecnico').value,desc:document.getElementById('mantDesc').value,estado:document.getElementById('mantEstado').value,sucursal:resolveSid()};db.mantenimientos.push(item);await saveDB();closeModal('mantModal');triggerNotif('nuevo_mantenimiento',item);renderAll();}
+async function saveInc(){const item={equipo:document.getElementById('incEquipo').value||'No especificado',prioridad:document.getElementById('incPrioridad').value,tipo:document.getElementById('incTipo').value,desc:document.getElementById('incDesc').value,estado:document.getElementById('incEstado').value,sucursal:resolveSid(),fecha:new Date().toISOString().split('T')[0]};db.incidencias.push(item);await saveDB();closeModal('incModal');triggerNotif('nueva_incidencia',item);renderAll();}
+async function saveMat(){const sub=parseFloat(document.getElementById('matSubtotal').value)||0;const item={nombre:document.getElementById('matNombre').value||'Sin nombre',cantidad:document.getElementById('matCantidad').value||1,unidad:document.getElementById('matUnidad').value,uso:document.getElementById('matUso').value,prioridad:document.getElementById('matPrioridad').value,estado:document.getElementById('matEstado').value,proveedor:document.getElementById('matProveedor').value,subtotal:sub,iva:parseFloat((sub*.16).toFixed(2)),totalConIva:parseFloat((sub*1.16).toFixed(2)),imgs:[...pendingImgs],sucursal:resolveSid(),fecha:new Date().toISOString().split('T')[0]};db.materiales.push(item);await saveDB();closeModal('matModal');triggerNotif('nueva_solicitud',item);renderAll();}
+
+document.querySelectorAll('.modal-bg').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.add('hidden');});});
+document.getElementById('lightbox').addEventListener('click',e=>{if(e.target===document.getElementById('lightbox'))closeLightbox();});
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+async function init(){
+  await loadDB();
+  buildLoginSelect();
+}
+init();
+</script>
+
+<footer style="
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(15,17,23,0.96);
+  backdrop-filter:blur(8px);
+  border-top:1px solid rgba(255,255,255,0.06);
+  padding:8px 20px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  z-index:50;
+  user-select:none;
+">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="opacity:.55">
+    <circle cx="12" cy="12" r="10" stroke="#8b93a7" stroke-width="1.5"/>
+    <path d="M15 9.5A4 4 0 1 0 15 14.5" stroke="#8b93a7" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  <span style="font-family:'DM Sans',sans-serif;font-size:11px;color:#525c73;letter-spacing:0.08em;">
+    Copyright &copy; <span id="copyrightYear"></span> <strong style="color:#8b93a7;letter-spacing:0.12em;">ROHEM</strong>. Todos los derechos reservados.
+  </span>
+</footer>
+<style>
+  body { padding-bottom: 38px; }
+</style>
+<script>
+  document.getElementById('copyrightYear').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

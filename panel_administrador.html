@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mantenimiento Royalty — Panel Administrador</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#00C48C;--accent-dim:#00a376;--accent-glow:rgba(0,196,140,0.14);
+  --surface:#0f1117;--surface2:#161b24;--surface3:#1e2535;--surface4:#252d3e;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text1:#f0f2f7;--text2:#8b93a7;--text3:#525c73;
+  --red:#ff4d6a;--amber:#ffb347;--blue:#4d9fff;--green:#00C48C;
+  --radius:10px;--radius-lg:14px;--radius-xl:20px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text1);min-height:100vh}
+.app{max-width:1060px;margin:0 auto;padding:1.25rem}
+.hidden{display:none!important}
+input,select,textarea{font-family:'DM Sans',sans-serif;font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);padding:9px 13px;width:100%;background:var(--surface3);color:var(--text1);transition:border-color .15s,box-shadow .15s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+select option{background:var(--surface3)}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border-radius:var(--radius);border:1px solid var(--border2);background:var(--surface3);color:var(--text2);padding:8px 16px;font-size:13px;font-weight:500;transition:all .15s}
+button:hover{background:var(--surface4);color:var(--text1)}
+button.primary{background:var(--accent);color:#0a1a12;border-color:var(--accent);font-weight:600}
+button.primary:hover{background:var(--accent-dim)}
+button.danger{background:rgba(255,77,106,.1);color:var(--red);border-color:rgba(255,77,106,.2)}
+.card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px}
+.b-green{background:rgba(0,196,140,.12);color:#00C48C}
+.b-amber{background:rgba(255,179,71,.12);color:#ffb347}
+.b-red{background:rgba(255,77,106,.12);color:#ff4d6a}
+.b-blue{background:rgba(77,159,255,.12);color:#4d9fff}
+.b-gray{background:rgba(139,147,167,.12);color:#8b93a7}
+.b-purple{background:rgba(168,127,255,.12);color:#a87fff}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 12px;color:var(--text3);font-weight:500;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text1);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:200}
+.modal{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-xl);padding:1.75rem;width:520px;max-width:96vw;max-height:93vh;overflow-y:auto}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:1.25rem}
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:11px;font-weight:500;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.c-green::before{background:var(--accent)}
+.stat-card.c-amber::before{background:var(--amber)}
+.stat-card.c-red::before{background:var(--red)}
+.stat-card.c-blue::before{background:var(--blue)}
+.stat-card.c-purple::before{background:#a87fff}
+.stat-num{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;line-height:1}
+.stat-label{font-size:10px;color:var(--text2);margin-top:4px;text-transform:uppercase;letter-spacing:.05em}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding:.9rem 1.25rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-lg)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-logo{width:42px;height:42px;background:#000;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:15px;font-weight:600;line-height:1.2}
+.brand-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
+.sec-head h2{font-size:15px;font-weight:600}
+.tab-bar{display:flex;gap:4px;background:var(--surface3);padding:4px;border-radius:var(--radius);width:fit-content;margin-bottom:1.25rem;flex-wrap:wrap}
+.tab{padding:7px 16px;font-size:12px;font-weight:500;border:none;background:none;cursor:pointer;color:var(--text2);border-radius:7px;transition:all .12s}
+.tab.active{background:var(--surface4);color:var(--text1)}
+.zone-pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em}
+.zp-sur{background:rgba(255,179,71,.12);color:#ffb347}
+.zp-centro{background:rgba(77,159,255,.12);color:#4d9fff}
+.zp-norte{background:rgba(255,77,106,.12);color:#ff4d6a}
+.zp-custom{background:rgba(168,127,255,.12);color:#a87fff}
+.notif-banner{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1rem 1.25rem;width:310px;z-index:300;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.notif-banner.success{border-left:3px solid var(--accent)}
+.notif-banner.info{border-left:3px solid var(--blue)}
+.encargado-card{background:var(--surface3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.enc-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;color:#0a1a12}
+.suc-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.suc-row:last-child{border-bottom:none}
+.cmp-bar-track{background:var(--surface4);border-radius:6px;height:8px;overflow:hidden;margin-top:4px;flex:1}
+.cmp-bar-fill{height:100%;border-radius:6px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.color-chip{width:30px;height:30px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
+.color-chip:hover,.color-chip.sel{border-color:var(--text1);transform:scale(1.1)}
+.schedule-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.schedule-row:last-child{border-bottom:none}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .25s ease forwards}
+@keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+.slide-in{animation:slideIn .3s ease forwards}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-logo">
+      <svg width="26" height="26" viewBox="0 0 60 60" fill="none">
+        <rect width="60" height="60" fill="#000"/>
+        <path d="M10 8 L10 52 M10 8 L34 8 Q50 8 50 24 Q50 36 38 38 L50 52 M10 30 L34 30" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name" id="brandName">Mantenimiento Royalty</div>
+      <div class="brand-sub">Panel de Administrador</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span class="badge b-blue">Administrador</span>
+    <a href="app_sucursales.html" style="font-size:12px;padding:7px 14px;color:var(--text2);text-decoration:none;border:1px solid var(--border2);border-radius:var(--radius);background:var(--surface3)">← App principal</a>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab active" onclick="showTab('comparativa',this)">Comparativa</button>
+  <button class="tab" onclick="showTab('encargados',this)">Encargados</button>
+  <button class="tab" onclick="showTab('reporte-semanal',this)">Reporte semanal</button>
+  <button class="tab" onclick="showTab('colores',this)">Colores</button>
+  <button class="tab" onclick="showTab('sucursales',this)">Sucursales</button>
+</div>
+
+<!-- COMPARATIVA -->
+<div id="tab-comparativa" class="fade-up">
+  <div class="sec-head">
+    <h2>Comparativa por sucursal</h2>
+    <select id="cmpMetrica" onchange="renderComparativa()" style="width:auto;padding:7px 12px;font-size:12px">
+      <option value="gastos">Gastos c/IVA</option>
+      <option value="incidencias">Incidencias</option>
+      <option value="mantenimientos">Mantenimientos</option>
+      <option value="solicitudes">Solicitudes</option>
+    </select>
+  </div>
+  <div id="cmpContent"></div>
+</div>
+
+<!-- ENCARGADOS -->
+<div id="tab-encargados" class="hidden fade-up">
+  <div class="sec-head"><h2>Encargados de mantenimiento</h2></div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:1.25rem;line-height:1.6">Asigna al responsable del área de mantenimiento de cada sucursal. Su nombre aparece en el dashboard de la sucursal y en los reportes semanales.</div>
+  <div id="encargadosList"></div>
+</div>
+
+<!-- REPORTE SEMANAL -->
+<div id="tab-reporte-semanal" class="hidden fade-up">
+  <div class="sec-head"><h2>Reporte semanal automático</h2><button class="primary" onclick="enviarReporteAhora()">Enviar reporte ahora</button></div>
+  <div class="card" style="margin-bottom:1rem">
+    <div style="font-size:13px;font-weight:500;margin-bottom:.5rem">Programación — cada lunes automáticamente</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:1rem;line-height:1.6">La app detecta si es lunes y si no se ha enviado el reporte esta semana. Si ambas condiciones se cumplen al abrir la app, genera y simula el envío automáticamente.</div>
+    <div id="scheduleStatus" style="background:var(--surface3);border-radius:var(--radius);padding:.85rem 1rem;font-size:13px;margin-bottom:1rem"></div>
+    <div class="grid2">
+      <div class="form-row"><label>Correo destino (área de pagos)</label><input id="schedEmail" placeholder="pagos@royaltycasino.com"/></div>
+      <div class="form-row"><label>Correo CC</label><input id="schedEmailCC" placeholder="gerencia@royaltycasino.com"/></div>
+    </div>
+    <div class="form-row"><label>Sucursales</label><select id="schedSucs"><option value="all">Todas las sucursales</option><option value="sur">Solo Zona Sur</option><option value="centro">Solo Zona Centro</option><option value="norte">Solo Zona Norte</option></select></div>
+    <button class="primary" onclick="saveSchedule()">Guardar configuración</button>
+    <div id="schedMsg" style="font-size:12px;margin-top:8px"></div>
+  </div>
+  <div class="card">
+    <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Historial de envíos</div>
+    <div id="schedHistory"></div>
+  </div>
+</div>
+
+<!-- COLORES -->
+<div id="tab-colores" class="hidden fade-up">
+  <div class="sec-head"><h2>Personalización del entorno</h2></div>
+  <div class="card" style="margin-bottom:1rem">
+    <div style="font-size:13px;font-weight:500;margin-bottom:.75rem">Color de acento principal</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1rem" id="accentPalette"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+      <label style="font-size:12px;color:var(--text2)">Personalizado:</label>
+      <input type="color" id="customAccent" value="#00C48C" style="width:46px;height:32px;padding:2px;cursor:pointer;border-radius:6px"/>
+      <button onclick="applyAccent(document.getElementById('customAccent').value)" style="font-size:12px;padding:6px 12px">Aplicar</button>
+    </div>
+    <div style="background:var(--surface3);border-radius:var(--radius);padding:.85rem 1rem;margin-bottom:1rem">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:.5rem">Vista previa</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="primary" style="font-size:12px;padding:6px 14px">Botón activo</button>
+        <span class="badge b-green">Estado activo</span>
+        <div style="width:48px;height:6px;border-radius:3px;background:var(--accent)"></div>
+      </div>
+    </div>
+    <button class="primary" onclick="saveColors()">Guardar colores</button>
+    <div id="colorMsg" style="font-size:12px;margin-top:8px"></div>
+  </div>
+  <div class="card" style="margin-bottom:1rem">
+    <div style="font-size:13px;font-weight:500;margin-bottom:.75rem">Fondo del entorno</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap" id="surfacePalette"></div>
+  </div>
+  <div class="card">
+    <div style="font-size:13px;font-weight:500;margin-bottom:.75rem">Nombre del sistema</div>
+    <div class="grid2">
+      <div class="form-row"><label>Nombre principal</label><input id="cfgBrandName" value="Mantenimiento Royalty"/></div>
+      <div class="form-row"><label>Subtítulo</label><input id="cfgBrandSub" value="Mantenimiento y Aires Acondicionados"/></div>
+    </div>
+    <button class="primary" onclick="saveBrand()">Guardar nombre</button>
+    <div id="brandMsg" style="font-size:12px;margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- SUCURSALES -->
+<div id="tab-sucursales" class="hidden fade-up">
+  <div class="sec-head"><h2>Gestión de sucursales</h2><button class="primary" onclick="toggleAddSuc()">+ Agregar sucursal</button></div>
+  <div class="card" id="addSucForm" style="margin-bottom:1rem;display:none">
+    <div style="font-size:13px;font-weight:500;margin-bottom:1rem">Nueva sucursal</div>
+    <div class="grid3">
+      <div class="form-row"><label>Nombre</label><input id="newSucName" placeholder="Ej: Monterrey"/></div>
+      <div class="form-row"><label>Zona</label>
+        <select id="newSucZona" onchange="document.getElementById('customZonaRow').classList.toggle('hidden',this.value!=='custom')">
+          <option value="sur">Zona Sur</option><option value="centro">Zona Centro</option><option value="norte">Zona Norte</option><option value="custom">Nueva zona...</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Contraseña</label><input id="newSucPass" placeholder="Contraseña de acceso"/></div>
+    </div>
+    <div class="form-row hidden" id="customZonaRow"><label>Nombre de la nueva zona</label><input id="newZonaName" placeholder="Ej: Zona Noreste"/></div>
+    <div style="display:flex;gap:8px">
+      <button class="primary" onclick="addSucursal()">Guardar sucursal</button>
+      <button onclick="toggleAddSuc()">Cancelar</button>
+    </div>
+    <div id="addSucMsg" style="font-size:12px;margin-top:8px"></div>
+  </div>
+  <div id="sucursalesList"></div>
+</div>
+
+</div>
+
+<!-- MODAL ENCARGADO -->
+<div id="encModal" class="modal-bg hidden">
+  <div class="modal">
+    <h3 id="encModalTitle">Encargado de mantenimiento</h3>
+    <div class="form-row"><label>Nombre completo</label><input id="encNombre" placeholder="Ej: Juan Carlos Pérez Martínez"/></div>
+    <div class="form-row"><label>Puesto / cargo</label><input id="encPuesto" placeholder="Ej: Jefe de Mantenimiento"/></div>
+    <div class="grid2">
+      <div class="form-row"><label>Teléfono</label><input id="encTel" placeholder="+52 999 123 4567"/></div>
+      <div class="form-row"><label>Correo</label><input id="encEmail" placeholder="jperez@royalty.com"/></div>
+    </div>
+    <div class="form-row"><label>Turno / especialidad / notas</label><textarea id="encNotas" rows="2" placeholder="Turno matutino, especialista en A/C, etc."></textarea></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem">
+      <button onclick="closeModal('encModal')">Cancelar</button>
+      <button class="primary" onclick="saveEncargado()">Guardar encargado</button>
+    </div>
+    <div id="encMsg" style="font-size:12px;margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- NOTIF -->
+<div id="notifBanner" class="notif-banner hidden slide-in">
+  <div style="display:flex;align-items:flex-start;gap:10px">
+    <div id="notifIcon" style="flex-shrink:0;margin-top:2px"></div>
+    <div style="flex:1"><div id="notifTitle" style="font-size:13px;font-weight:600;margin-bottom:3px"></div><div id="notifBody" style="font-size:12px;color:var(--text2);line-height:1.5"></div></div>
+    <button onclick="document.getElementById('notifBanner').classList.add('hidden')" style="border:none;background:none;color:var(--text3);padding:0;font-size:16px">×</button>
+  </div>
+</div>
+
+<script>
+const ZONAS_DEFAULT=[
+  {id:'sur',name:'Zona Sur',cls:'zp-sur',color:'#ffb347'},
+  {id:'centro',name:'Zona Centro',cls:'zp-centro',color:'#4d9fff'},
+  {id:'norte',name:'Zona Norte',cls:'zp-norte',color:'#ff4d6a'},
+];
+const SUCS_DEFAULT=[
+  {id:'veracruz',name:'Veracruz',zona:'sur',pass:'veracruz'},
+  {id:'coatza',name:'Coatzacoalcos',zona:'sur',pass:'coatzacoalcos'},
+  {id:'villahermosa',name:'Villahermosa',zona:'sur',pass:'villahermosa'},
+  {id:'carmen',name:'Ciudad del Carmen',zona:'sur',pass:'ciudaddelcarmen'},
+  {id:'campeche',name:'Campeche',zona:'sur',pass:'campeche'},
+  {id:'tapachula',name:'Tapachula',zona:'sur',pass:'tapachula'},
+  {id:'cuspide',name:'Cúspide',zona:'centro',pass:'cuspide'},
+  {id:'guadalajara',name:'Guadalajara',zona:'centro',pass:'guadalajara'},
+  {id:'leon',name:'León',zona:'centro',pass:'leon'},
+  {id:'aguascalientes',name:'Aguascalientes',zona:'centro',pass:'aguascalientes'},
+  {id:'juarez',name:'Ciudad Juárez',zona:'norte',pass:'ciudadjuarez'},
+  {id:'navojoa',name:'Navojoa',zona:'norte',pass:'navojoa'},
+];
+const ACCENT_COLORS=[{hex:'#00C48C',l:'Esmeralda'},{hex:'#4d9fff',l:'Azul'},{hex:'#a87fff',l:'Púrpura'},{hex:'#ffb347',l:'Ámbar'},{hex:'#ff4d6a',l:'Rojo'},{hex:'#ff6b9d',l:'Rosa'},{hex:'#00d4ff',l:'Cyan'},{hex:'#f0f2f7',l:'Blanco'}];
+const SURFACE_COLORS=[{bg:'#0f1117',l:'Negro profundo'},{bg:'#0d1520',l:'Azul marino'},{bg:'#140f17',l:'Violeta oscuro'},{bg:'#0f1710',l:'Verde oscuro'},{bg:'#17100f',l:'Marrón oscuro'},{bg:'#1a1a1a',l:'Gris antracita'}];
+
+let encEditId=null;
+let db={sucursales:[...SUCS_DEFAULT],zonas:[...ZONAS_DEFAULT],encargados:{},colores:{accent:'#00C48C',surface:'#0f1117'},brand:{name:'Mantenimiento Royalty',sub:'Mantenimiento y Aires Acondicionados'},schedule:{email:'',emailCC:'',sucs:'all'},schedHistory:[],mainData:{inventario:[],mantenimientos:[],incidencias:[],materiales:[]}};
+
+// ═══════════════════════════════════════════
+// FIREBASE FIRESTORE
+// ═══════════════════════════════════════════
+const FB_CFG={
+  apiKey:"AIzaSyANmm-s7Hv02t9Wcl1oV1owz08NLDozvdE",
+  authDomain:"royalty-mantenimiento.firebaseapp.com",
+  projectId:"royalty-mantenimiento",
+  storageBucket:"royalty-mantenimiento.firebasestorage.app",
+  messagingSenderId:"569499949929",
+  appId:"1:569499949929:web:1c6ad3e4c4b7f737fe3bf8"
+};
+let _db_fs=null,_fsDoc=null,_fsGetDoc=null,_fsSetDoc=null,_fsOnSnapshot=null;
+
+async function initFirebase(){
+  if(_db_fs)return;
+  try{
+    const {initializeApp,getApps}=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+    const {getFirestore,doc,getDoc,setDoc,onSnapshot}=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const app=getApps().length?getApps()[0]:initializeApp(FB_CFG);
+    _db_fs=getFirestore(app);
+    _fsDoc=doc;_fsGetDoc=getDoc;_fsSetDoc=setDoc;_fsOnSnapshot=onSnapshot;
+  }catch(e){console.error('Firebase init error:',e);}
+}
+
+async function loadDB(){
+  await initFirebase();
+  try{
+    if(_db_fs){
+      const ref=_fsDoc(_db_fs,'royalty','maindb');
+      const snap=await _fsGetDoc(ref);
+      if(snap.exists()){const sv=snap.data();db={...db,...sv};}
+      // Escucha cambios en tiempo real
+      _fsOnSnapshot(ref,(snap)=>{
+        if(snap.exists()){const sv=snap.data();db={...db,...sv};renderComparativa();}
+      });
+    }
+  }catch(e){
+    console.warn('Firestore error, usando localStorage:',e);
+    try{const v=localStorage.getItem('royalty_main_v1');if(v){const sv=JSON.parse(v);db={...db,...sv};}}catch(e2){}
+  }
+  if(!db.encargados)db.encargados={};
+  if(!db.sucursales?.length)db.sucursales=[...SUCS_DEFAULT];
+  if(!db.zonas?.length)db.zonas=[...ZONAS_DEFAULT];
+}
+
+async function saveDB(){
+  try{
+    await initFirebase();
+    if(_db_fs){
+      const dbCloud={...db,materiales:(db.materiales||[]).map(m=>({...m,imgs:[]}))};
+      await _fsSetDoc(_fsDoc(_db_fs,'royalty','maindb'),dbCloud);
+    }
+  }catch(e){console.warn('Firestore save error:',e);}
+  try{localStorage.setItem('royalty_main_v1',JSON.stringify(db));}catch(e){}
+}
+
+function getZona(id){return db.zonas.find(z=>z.id===id)||{name:id,cls:'zp-custom',color:'#a87fff'};}
+function getSucsForZona(zid){return db.sucursales.filter(s=>s.zona===zid);}
+function getSName(id){const s=db.sucursales.find(x=>x.id===id);return s?s.name:id;}
+function fmt(n){return'$'+parseFloat(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function avatarColor(name){const c=['#00C48C','#4d9fff','#ffb347','#a87fff','#ff4d6a','#00d4ff'];let h=0;for(let ch of(name||'?'))h+=ch.charCodeAt(0);return c[h%c.length];}
+function initials(name){return(name||'?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+function zpHtml(sid){const s=db.sucursales.find(x=>x.id===sid);if(!s)return'';const z=getZona(s.zona);return`<span class="zone-pill ${z.cls}" style="font-size:9px;padding:1px 6px">${z.name}</span>`;}
+
+function showTab(tab,btn){
+  ['comparativa','encargados','reporte-semanal','colores','sucursales'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el){if(t===tab){el.classList.remove('hidden');el.classList.add('fade-up');}else el.classList.add('hidden');}
+  });
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  if(tab==='comparativa')renderComparativa();
+  if(tab==='encargados')renderEncargados();
+  if(tab==='reporte-semanal')renderSchedule();
+  if(tab==='colores')renderColorPickers();
+  if(tab==='sucursales')renderSucursales();
+}
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+
+// ── COMPARATIVA ──
+function renderComparativa(){
+  const el=document.getElementById('cmpContent');if(!el)return;
+  const metrica=document.getElementById('cmpMetrica').value;
+  const md=db.mainData||{inventario:[],mantenimientos:[],incidencias:[],materiales:[]};
+  const data=db.sucursales.map(s=>{
+    let val=0,detail='';
+    if(metrica==='gastos'){val=md.materiales.filter(m=>m.sucursal===s.id).reduce((a,m)=>a+(m.totalConIva||0),0);detail=fmt(val);}
+    else if(metrica==='incidencias'){val=md.incidencias.filter(i=>i.sucursal===s.id).length;detail=val+' incidencias';}
+    else if(metrica==='mantenimientos'){val=md.mantenimientos.filter(m=>m.sucursal===s.id).length;detail=val+' programados';}
+    else{val=md.materiales.filter(m=>m.sucursal===s.id).length;detail=val+' solicitudes';}
+    return{...s,val,detail};
+  }).sort((a,b)=>b.val-a.val);
+  const maxVal=Math.max(...data.map(d=>d.val),1);
+  const totalVal=data.reduce((a,d)=>a+d.val,0);
+  const metricas={'gastos':'Gasto c/IVA','incidencias':'Incidencias','mantenimientos':'Mantenimientos','solicitudes':'Solicitudes'};
+  const zonaStats=db.zonas.map(z=>{const sucs=data.filter(d=>d.zona===z.id);const total=sucs.reduce((a,d)=>a+d.val,0);return{...z,total,sucs:sucs.length};});
+
+  el.innerHTML=`
+  <div class="grid3" style="margin-bottom:1.25rem">
+    ${zonaStats.map((z,i)=>`<div class="stat-card ${i===0?'c-amber':i===1?'c-blue':'c-red'}"><div class="stat-num" style="font-size:16px">${metrica==='gastos'?fmt(z.total):z.total}</div><div class="stat-label">${z.name} · ${z.sucs} sucs.</div></div>`).join('')}
+  </div>
+  <div class="grid2" style="gap:1rem;margin-bottom:1rem">
+    <div class="card">
+      <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">${metricas[metrica]} por sucursal</div>
+      ${data.map((d,i)=>{const pct=Math.round((d.val/maxVal)*100);const zona=getZona(d.zona);return`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:11px;font-weight:600;color:var(--text3);min-width:16px">${i+1}</span><span style="font-size:13px">${d.name}</span><span class="zone-pill ${zona.cls}" style="font-size:9px;padding:1px 6px">${zona.name}</span></div><span style="font-size:12px;font-family:'DM Mono',monospace;font-weight:500">${d.detail}</span></div><div class="cmp-bar-track"><div class="cmp-bar-fill" style="width:${pct}%;background:${zona.color}"></div></div></div>`;}).join('')}
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table><thead><tr><th>Sucursal</th><th>Zona</th><th>${metricas[metrica]}</th><th>% del total</th></tr></thead><tbody>
+        ${data.map(d=>{const zona=getZona(d.zona);const pct=totalVal>0?Math.round((d.val/totalVal)*100):0;return`<tr><td style="font-weight:500">${d.name}</td><td><span class="zone-pill ${zona.cls}" style="font-size:10px">${zona.name}</span></td><td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent)">${d.detail}</td><td><div style="display:flex;align-items:center;gap:6px"><div style="width:38px;background:var(--surface4);border-radius:3px;height:5px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${zona.color}"></div></div><span style="font-size:11px;color:var(--text2)">${pct}%</span></div></td></tr>`;}).join('')}
+      </tbody></table>
+    </div>
+  </div>
+  <div class="card">
+    <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Top 3 — ${metricas[metrica]}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+      ${data.slice(0,3).map((d,i)=>{const zona=getZona(d.zona);const enc=db.encargados[d.id];return`<div style="background:var(--surface3);border-radius:var(--radius-lg);padding:1rem;border:1px solid var(--border)"><div style="font-size:22px;margin-bottom:6px">${['🥇','🥈','🥉'][i]}</div><div style="font-size:14px;font-weight:600;margin-bottom:3px">${d.name}</div><span class="zone-pill ${zona.cls}" style="font-size:9px;display:inline-flex;margin-bottom:8px">${zona.name}</span>${enc?`<div style="font-size:11px;color:var(--text2);margin-bottom:6px">Enc: ${enc.nombre}</div>`:''}<div style="font-size:18px;font-weight:500;font-family:'DM Mono',monospace;color:var(--accent)">${d.detail}</div></div>`;}).join('')}
+    </div>
+  </div>`;
+}
+
+// ── ENCARGADOS ──
+function renderEncargados(){
+  const el=document.getElementById('encargadosList');if(!el)return;
+  el.innerHTML=db.zonas.map(z=>`
+    <div class="card" style="margin-bottom:1rem">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
+        <span class="zone-pill ${z.cls}">${z.name}</span>
+        <span style="font-size:12px;color:var(--text2)">${getSucsForZona(z.id).length} sucursales</span>
+      </div>
+      ${getSucsForZona(z.id).map(s=>{
+        const enc=db.encargados[s.id];
+        return`<div class="encargado-card">
+          <div class="enc-avatar" style="background:${avatarColor(enc?.nombre||s.name)}">${enc?initials(enc.nombre):'?'}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:var(--text1)">${s.name}</div>
+            ${enc?`
+              <div style="font-size:13px;color:var(--text1);margin-top:2px;font-weight:500">${enc.nombre}</div>
+              <div style="font-size:12px;color:var(--text2)">${enc.puesto||''}${enc.tel?` · ${enc.tel}`:''}</div>
+              ${enc.email?`<div style="font-size:11px;color:var(--text3)">${enc.email}</div>`:''}
+              ${enc.notas?`<div style="font-size:11px;color:var(--text3);font-style:italic">${enc.notas}</div>`:''}
+              <div style="font-size:10px;color:var(--text3);margin-top:3px">Actualizado: ${enc.updatedAt||'—'}</div>
+            `:`<div style="font-size:12px;color:var(--text3);margin-top:3px;font-style:italic">Sin encargado asignado</div>`}
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button onclick="openEncModal('${s.id}')" style="font-size:12px;padding:5px 12px">${enc?'Editar':'Asignar'}</button>
+            ${enc?`<button onclick="deleteEncargado('${s.id}')" class="danger" style="font-size:12px;padding:5px 12px">Quitar</button>`:''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+
+function openEncModal(sucId){
+  encEditId=sucId;
+  const s=db.sucursales.find(x=>x.id===sucId);
+  document.getElementById('encModalTitle').textContent=`Encargado — ${s?.name||sucId}`;
+  const enc=db.encargados[sucId]||{};
+  ['encNombre','encPuesto','encTel','encEmail','encNotas'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value=enc[id.replace('enc','').toLowerCase()]||'';
+  });
+  document.getElementById('encNombre').value=enc.nombre||'';
+  document.getElementById('encPuesto').value=enc.puesto||'';
+  document.getElementById('encTel').value=enc.tel||'';
+  document.getElementById('encEmail').value=enc.email||'';
+  document.getElementById('encNotas').value=enc.notas||'';
+  document.getElementById('encMsg').textContent='';
+  document.getElementById('encModal').classList.remove('hidden');
+}
+
+async function saveEncargado(){
+  const nombre=document.getElementById('encNombre').value.trim();
+  const msg=document.getElementById('encMsg');
+  if(!nombre){msg.style.color='var(--red)';msg.textContent='Ingresa el nombre';return;}
+  db.encargados[encEditId]={nombre,puesto:document.getElementById('encPuesto').value,tel:document.getElementById('encTel').value,email:document.getElementById('encEmail').value,notas:document.getElementById('encNotas').value,updatedAt:new Date().toLocaleDateString('es-MX')};
+  await saveDB();closeModal('encModal');renderEncargados();
+  showNotif('success','✓ Encargado guardado',`${nombre} asignado a ${getSName(encEditId)}`);
+}
+
+async function deleteEncargado(sucId){
+  const enc=db.encargados[sucId];
+  if(!confirm(`¿Quitar a ${enc?.nombre}?`))return;
+  delete db.encargados[sucId];await saveDB();renderEncargados();
+  showNotif('info','Encargado removido',`${getSName(sucId)} quedó sin encargado asignado`);
+}
+
+// ── SCHEDULE ──
+function renderSchedule(){
+  const now=new Date();
+  const isMonday=now.getDay()===1;
+  const status=document.getElementById('scheduleStatus');
+  status.innerHTML=`<div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:${isMonday?'var(--accent)':'var(--amber)'}"></div><span>Hoy es <strong>${now.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'})}</strong>${isMonday?' — Hoy corresponde enviar el reporte semanal':'. El próximo reporte es el lunes.'}</span></div>`;
+  document.getElementById('schedEmail').value=db.schedule?.email||'';
+  document.getElementById('schedEmailCC').value=db.schedule?.emailCC||'';
+  const sv=document.getElementById('schedSucs');if(sv&&db.schedule?.sucs)sv.value=db.schedule.sucs;
+  const hist=document.getElementById('schedHistory');
+  const histData=db.schedHistory||[];
+  hist.innerHTML=histData.length?`<table><thead><tr><th>Fecha</th><th>Sucursales</th><th>Destinatario</th><th>Estado</th></tr></thead><tbody>${histData.slice(-8).reverse().map(h=>`<tr><td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2)">${h.fecha}</td><td>${h.sucs}</td><td style="font-size:12px;color:var(--text2)">${h.email}</td><td><span class="badge b-green">Enviado</span></td></tr>`).join('')}</tbody></table>`:
+    '<div style="text-align:center;padding:1.5rem;color:var(--text3);font-size:13px">Sin historial de envíos</div>';
+  checkAutoSend();
+}
+
+function getWeekKey(d){const jan1=new Date(d.getFullYear(),0,1);const week=Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);return`${d.getFullYear()}-W${week}`;}
+async function checkAutoSend(){const now=new Date();if(now.getDay()!==1)return;const wk=getWeekKey(now);if(db.lastReportWeek===wk)return;if(!db.schedule?.email)return;await doSendReport(true);db.lastReportWeek=wk;await saveDB();}
+
+async function saveSchedule(){
+  if(!db.schedule)db.schedule={};
+  db.schedule.email=document.getElementById('schedEmail').value;
+  db.schedule.emailCC=document.getElementById('schedEmailCC').value;
+  db.schedule.sucs=document.getElementById('schedSucs').value;
+  await saveDB();const msg=document.getElementById('schedMsg');
+  msg.style.color='var(--green)';msg.textContent='✓ Guardado. El reporte se enviará automáticamente cada lunes al abrir la app.';
+  setTimeout(()=>{msg.textContent='';},4000);
+}
+
+function enviarReporteAhora(){doSendReport(false);}
+async function doSendReport(auto){
+  const email=db.schedule?.email||'pagos@royaltycasino.com';
+  const now=new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const sucLabel=db.schedule?.sucs==='all'?'Todas las sucursales':db.schedule?.sucs==='sur'?'Zona Sur':db.schedule?.sucs==='centro'?'Zona Centro':'Zona Norte';
+  if(!db.schedHistory)db.schedHistory=[];
+  db.schedHistory.push({fecha:new Date().toLocaleDateString('es-MX'),sucs:sucLabel,email});
+  if(db.schedHistory.length>20)db.schedHistory.shift();
+  await saveDB();renderSchedule();
+  showNotif('success',auto?'📅 Reporte semanal automático enviado':'✅ Reporte enviado',`Destino: ${email}\nSucursales: ${sucLabel}\n${now}`);
+}
+
+// ── COLORES ──
+function renderColorPickers(){
+  const ap=document.getElementById('accentPalette');
+  ap.innerHTML=ACCENT_COLORS.map(c=>`<div title="${c.l}" onclick="applyAccent('${c.hex}')" class="color-chip ${(db.colores?.accent||'#00C48C')===c.hex?'sel':''}" style="background:${c.hex}"></div>`).join('');
+  const sp=document.getElementById('surfacePalette');
+  sp.innerHTML=SURFACE_COLORS.map(c=>`<div title="${c.l}" onclick="applySurface('${c.bg}')" class="color-chip ${(db.colores?.surface||'#0f1117')===c.bg?'sel':''}" style="background:${c.bg};border:1px solid rgba(255,255,255,.2)"></div>`).join('');
+  document.getElementById('customAccent').value=db.colores?.accent||'#00C48C';
+}
+function applyAccent(hex){if(!db.colores)db.colores={};db.colores.accent=hex;document.documentElement.style.setProperty('--accent',hex);renderColorPickers();}
+function applySurface(bg){if(!db.colores)db.colores={};db.colores.surface=bg;document.documentElement.style.setProperty('--surface',bg);renderColorPickers();showNotif('info','🎨 Fondo actualizado','El color se aplicó al entorno');}
+async function saveColors(){await saveDB();const msg=document.getElementById('colorMsg');msg.style.color='var(--green)';msg.textContent='✓ Colores guardados. Se aplicarán en cada sesión.';setTimeout(()=>{msg.textContent='';},3000);showNotif('success','✅ Colores guardados','La personalización se guardó');}
+async function saveBrand(){if(!db.brand)db.brand={};db.brand.name=document.getElementById('cfgBrandName').value||'Mantenimiento Royalty';db.brand.sub=document.getElementById('cfgBrandSub').value;document.getElementById('brandName').textContent=db.brand.name;await saveDB();const msg=document.getElementById('brandMsg');msg.style.color='var(--green)';msg.textContent='✓ Nombre actualizado';setTimeout(()=>{msg.textContent='';},2500);}
+
+// ── SUCURSALES ──
+function renderSucursales(){
+  const el=document.getElementById('sucursalesList');
+  el.innerHTML=db.zonas.map(z=>`
+    <div class="card" style="margin-bottom:1rem">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:.85rem">
+        <span class="zone-pill ${z.cls}">${z.name}</span>
+        <span style="font-size:12px;color:var(--text2)">${getSucsForZona(z.id).length} sucursales</span>
+      </div>
+      ${getSucsForZona(z.id).map(s=>{
+        const enc=db.encargados[s.id];
+        return`<div class="suc-row">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500">${s.name}</div>
+            <div style="font-size:11px;color:var(--text3);font-family:'DM Mono',monospace">ID: ${s.id} · Clave: ${'•'.repeat((db.passwords?.[s.id]||s.pass).length)}</div>
+            ${enc?`<div style="font-size:11px;color:var(--accent);margin-top:2px">Enc: ${enc.nombre}</div>`:''}
+          </div>
+          <div style="display:flex;gap:6px">
+            <button onclick="editSucPass('${s.id}')" style="font-size:12px;padding:5px 10px">Cambiar clave</button>
+            <button onclick="deleteSuc('${s.id}')" class="danger" style="font-size:12px;padding:5px 10px">Eliminar</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+let addSucOpen=false;
+function toggleAddSuc(){addSucOpen=!addSucOpen;document.getElementById('addSucForm').style.display=addSucOpen?'block':'none';}
+async function addSucursal(){
+  const name=document.getElementById('newSucName').value.trim();
+  const zonaVal=document.getElementById('newSucZona').value;
+  const pass=document.getElementById('newSucPass').value.trim();
+  const msg=document.getElementById('addSucMsg');
+  if(!name||!pass){msg.style.color='var(--red)';msg.textContent='Completa nombre y contraseña';return;}
+  let zonaId=zonaVal;
+  if(zonaVal==='custom'){const zname=document.getElementById('newZonaName').value.trim();if(!zname){msg.style.color='var(--red)';msg.textContent='Escribe el nombre de la nueva zona';return;}zonaId='zona_'+Date.now();db.zonas.push({id:zonaId,name:zname,cls:'zp-custom',color:'#a87fff'});}
+  const id=name.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+  if(db.sucursales.find(s=>s.id===id)){msg.style.color='var(--red)';msg.textContent='Ya existe esa sucursal';return;}
+  db.sucursales.push({id,name,zona:zonaId,pass});
+  if(!db.passwords)db.passwords={};db.passwords[id]=pass;
+  await saveDB();msg.style.color='var(--green)';msg.textContent=`✓ "${name}" agregada`;
+  setTimeout(()=>{toggleAddSuc();renderSucursales();msg.textContent='';},1200);
+}
+async function deleteSuc(id){const s=db.sucursales.find(x=>x.id===id);if(!confirm(`¿Eliminar "${s?.name}"?`))return;db.sucursales=db.sucursales.filter(x=>x.id!==id);delete db.encargados[id];await saveDB();renderSucursales();showNotif('info','Sucursal eliminada',`"${s?.name}" removida del sistema`);}
+function editSucPass(id){const s=db.sucursales.find(x=>x.id===id);const np=prompt(`Nueva contraseña para ${s?.name}:`);if(!np||np.length<3){alert('Contraseña muy corta');return;}if(!db.passwords)db.passwords={};db.passwords[id]=np;saveDB();showNotif('success','✓ Contraseña actualizada',`${s?.name}: nueva clave guardada`);renderSucursales();}
+
+// ── NOTIF ──
+let notifTimer=null;
+function showNotif(ch,title,body){
+  clearTimeout(notifTimer);const b=document.getElementById('notifBanner');
+  b.className='notif-banner slide-in '+(ch==='success'?'success':'info');
+  document.getElementById('notifTitle').textContent=title;
+  document.getElementById('notifBody').textContent=body;
+  document.getElementById('notifIcon').innerHTML=ch==='success'?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+  b.classList.remove('hidden');notifTimer=setTimeout(()=>b.classList.add('hidden'),5000);
+}
+
+document.querySelectorAll('.modal-bg').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.add('hidden');});});
+
+async function init(){
+  await loadDB();
+  if(db.colores?.accent)document.documentElement.style.setProperty('--accent',db.colores.accent);
+  if(db.colores?.surface)document.documentElement.style.setProperty('--surface',db.colores.surface);
+  if(db.brand?.name)document.getElementById('brandName').textContent=db.brand.name;
+  renderComparativa();
+  checkAutoSend();
+}
+init();
+</script>
+
+<footer style="
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(15,17,23,0.96);
+  backdrop-filter:blur(8px);
+  border-top:1px solid rgba(255,255,255,0.06);
+  padding:8px 20px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  z-index:50;
+  user-select:none;
+">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="opacity:.55">
+    <circle cx="12" cy="12" r="10" stroke="#8b93a7" stroke-width="1.5"/>
+    <path d="M15 9.5A4 4 0 1 0 15 14.5" stroke="#8b93a7" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  <span style="font-family:'DM Sans',sans-serif;font-size:11px;color:#525c73;letter-spacing:0.08em;">
+    Copyright &copy; <span id="copyrightYear"></span> <strong style="color:#8b93a7;letter-spacing:0.12em;">ROHEM</strong>. Todos los derechos reservados.
+  </span>
+</footer>
+<style>
+  body { padding-bottom: 38px; }
+</style>
+<script>
+  document.getElementById('copyrightYear').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
