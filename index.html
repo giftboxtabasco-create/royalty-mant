@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Mantenimiento Royalty — Sucursales</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<!-- PWA -->
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#00C48C"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Royalty Mant"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="application-name" content="Royalty Mant"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -772,6 +781,30 @@ async function init(){
   buildLoginSelect();
 }
 init();
+
+// Registrar Service Worker para PWA
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(reg=>console.log('SW registrado:',reg.scope))
+      .catch(err=>console.warn('SW error:',err));
+  });
+}
+
+// Banner de instalación en móvil
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  // Muestra botón instalar en topbar si es móvil
+  if(window.innerWidth<768){
+    const btn=document.createElement('button');
+    btn.textContent='📲 Instalar app';
+    btn.style.cssText='font-size:12px;padding:7px 13px;background:var(--accent);color:#0a1a12;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;font-family:inherit';
+    btn.onclick=()=>{deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{btn.remove();});};
+    document.querySelector('.topbar-right')?.prepend(btn);
+  }
+});
 </script>
 
 <footer style="
